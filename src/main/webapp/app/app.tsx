@@ -1,5 +1,6 @@
 import 'react-toastify/dist/ReactToastify.css';
 import './app.scss';
+import 'antd/dist/antd.css';
 
 import React from 'react';
 import { connect } from 'react-redux';
@@ -18,6 +19,7 @@ import { hasAnyAuthority } from 'app/shared/auth/private-route';
 import ErrorBoundary from 'app/shared/error/error-boundary';
 import { AUTHORITIES } from 'app/config/constants';
 import AppRoutes from 'app/routes';
+import AuthFlow from 'app/shared/layout/authFlow/authFlow';
 
 const baseHref = document
   .querySelector('base')
@@ -34,8 +36,11 @@ export class App extends React.Component<IAppProps> {
 
   render() {
     const paddingTop = '60px';
-    return (
-      <Router basename={baseHref}>
+
+    let pageBody = null;
+
+    if (this.props.isAuthenticated) {
+      pageBody = (
         <div className="app-container" style={{ paddingTop }}>
           <ToastContainer position={toast.POSITION.TOP_LEFT} className="toastify-container" toastClassName="toastify-toast" />
           <ErrorBoundary>
@@ -58,8 +63,18 @@ export class App extends React.Component<IAppProps> {
             <Footer />
           </div>
         </div>
-      </Router>
-    );
+      );
+    } else {
+      pageBody = (
+        <div className="login-flow-container">
+          <ErrorBoundary>
+            <AuthFlow />
+          </ErrorBoundary>
+        </div>
+      );
+    }
+
+    return <Router basename={baseHref}>{pageBody}</Router>;
   }
 }
 

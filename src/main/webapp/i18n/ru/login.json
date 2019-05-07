@@ -1,11 +1,14 @@
 {
   "login": {
-    "title": "Авторизация",
+    "title": "Вход",
+    "usingLoanExchange": "Используйте аккаунт loanExchange",
+    "usingAnotherProvider": "Или войдите используюя следующии сервисы",
     "form": {
       "password": "Пароль",
       "password.placeholder": "Ваш пароль",
       "rememberme": "Входить автоматически",
-      "button": "Войти"
+      "button": "Войти",
+      "email": "Пожалуйста введите ваш email!"
     },
     "messages": {
       "error": {

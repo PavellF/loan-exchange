@@ -2,7 +2,7 @@
   "register": {
     "title": "Регистрация",
     "form": {
-      "button": "Зарегистрироваться"
+      "button": "Создать аккаунт"
     },
     "messages": {
       "validate": {
