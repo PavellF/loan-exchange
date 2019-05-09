@@ -13,7 +13,7 @@ export interface IRegisterProps extends StateProps, DispatchProps {}
 export interface IRegisterState {
   password: string;
 }
-
+//TODO delete
 export class RegisterPage extends React.Component<IRegisterProps, IRegisterState> {
   state: IRegisterState = {
     password: ''
@@ -24,7 +24,7 @@ export class RegisterPage extends React.Component<IRegisterProps, IRegisterState
   }
 
   handleValidSubmit = (event, values) => {
-    this.props.handleRegister(values.username, values.email, values.firstPassword, this.props.currentLocale);
+    //this.props.handleRegister(values.username, values.email, values.firstPassword, this.props.currentLocale);
     event.preventDefault();
   };
 
@@ -79,7 +79,7 @@ export class RegisterPage extends React.Component<IRegisterProps, IRegisterState
                   maxLength: { value: 50, errorMessage: translate('global.messages.validate.newpassword.maxlength') }
                 }}
               />
-              <PasswordStrengthBar password={this.state.password} />
+
               <AvField
                 name="secondPassword"
                 label={translate('global.form.confirmpassword.label')}

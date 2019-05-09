@@ -5,7 +5,7 @@ import 'antd/dist/antd.css';
 import React from 'react';
 import { connect } from 'react-redux';
 import { Card } from 'reactstrap';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { BrowserRouter as Router, Redirect, Switch } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import { hot } from 'react-hot-loader';
 
@@ -20,6 +20,8 @@ import ErrorBoundary from 'app/shared/error/error-boundary';
 import { AUTHORITIES } from 'app/config/constants';
 import AppRoutes from 'app/routes';
 import AuthFlow from 'app/shared/layout/authFlow/authFlow';
+import Register from 'app/modules/account/register/register';
+import ErrorBoundaryRoute from 'app/shared/error/error-boundary-route';
 
 const baseHref = document
   .querySelector('base')
@@ -68,7 +70,11 @@ export class App extends React.Component<IAppProps> {
       pageBody = (
         <div className="login-flow-container">
           <ErrorBoundary>
-            <AuthFlow />
+            <Switch>
+              <ErrorBoundaryRoute path="/auth" component={AuthFlow} />
+              <Redirect to="/auth" />
+            </Switch>
+            <footer>this is footer</footer>
           </ErrorBoundary>
         </div>
       );
