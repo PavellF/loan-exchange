@@ -22,6 +22,7 @@ import AppRoutes from 'app/routes';
 import AuthFlow from 'app/shared/layout/authFlow/authFlow';
 import Register from 'app/modules/account/register/register';
 import ErrorBoundaryRoute from 'app/shared/error/error-boundary-route';
+import { LocaleMenu } from 'app/shared/layout/menus';
 
 const baseHref = document
   .querySelector('base')
@@ -41,7 +42,7 @@ export class App extends React.Component<IAppProps> {
 
     let pageBody = null;
 
-    if (this.props.isAuthenticated) {
+    if (this.props.isAuthenticated || true) {
       pageBody = (
         <div className="app-container" style={{ paddingTop }}>
           <ToastContainer position={toast.POSITION.TOP_LEFT} className="toastify-container" toastClassName="toastify-toast" />
@@ -62,7 +63,6 @@ export class App extends React.Component<IAppProps> {
                 <AppRoutes />
               </ErrorBoundary>
             </Card>
-            <Footer />
           </div>
         </div>
       );
@@ -74,7 +74,7 @@ export class App extends React.Component<IAppProps> {
               <ErrorBoundaryRoute path="/auth" component={AuthFlow} />
               <Redirect to="/auth" />
             </Switch>
-            <footer>this is footer</footer>
+            <Footer oneline currentLocale={this.props.currentLocale} onLocaleChange={this.props.setLocale} />
           </ErrorBoundary>
         </div>
       );

@@ -1,11 +1,26 @@
 import './footer.scss';
 
 import React from 'react';
-import { Translate } from 'react-jhipster';
+import { Storage, Translate } from 'react-jhipster';
 import { Col, Row } from 'reactstrap';
 import { LocaleMenu } from 'app/shared/layout/menus';
 
-const Footer = props => (
+const Footer = ({ currentLocale, onLocaleChange, oneline = false }) => {
+  const handleLocaleChange = value => {
+    const langKey = value;
+    Storage.session.set('locale', langKey);
+    onLocaleChange(langKey);
+  };
+
+  if (oneline) {
+    return (
+      <footer style={{ margin: '0.5rem 0' }}>
+        <LocaleMenu maxInline={3} currentLocale={currentLocale} onChange={handleLocaleChange} />
+      </footer>
+    );
+  }
+};
+/*(
   <div className="footer page-content">
     <Row>
       <Col md="4">
@@ -24,6 +39,6 @@ const Footer = props => (
       </Col>
     </Row>
   </div>
-);
+);*/
 
 export default Footer;

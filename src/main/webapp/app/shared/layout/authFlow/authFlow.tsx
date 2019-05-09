@@ -18,6 +18,7 @@ import { handleRegister, reset } from 'app/modules/account/register/register.red
 import { connect } from 'react-redux';
 import { defaultValue, IUser } from 'app/shared/model/user.model';
 import LoadingBar from 'react-redux-loading-bar';
+import Progress from 'antd/lib/progress';
 
 const ENTER_EMAIL = 'ENTER_EMAIL';
 const SELECT_ROLE = 'SELECT_ROLE';
@@ -123,7 +124,7 @@ const AuthFlow = props => {
   if (flowStack[flowStack.length - 1] === ENTER_EMAIL || flowStack[flowStack.length - 1] === ENTER_PASSWORD) {
     return (
       <Card style={{ width: 400 }}>
-        <LoadingBar className="loading-bar" />
+        <Progress percent={50} status="active" showInfo={false} />
         <Form onSubmit={handleSignIn}>
           <div className={flowStack[flowStack.length - 1] === ENTER_EMAIL ? 'active' : 'hidden'}>
             <div className="email-card__head">
@@ -389,6 +390,14 @@ const AuthFlow = props => {
             </p>
           </div>
         </Form>
+      </Card>
+    );
+  } else {
+    return (
+      <Card style={{ maxWidth: 400 }}>
+        <a onClick={() => dispatch({ type: GO_BACK })}>
+          <Icon type="arrow-left" />
+        </a>
       </Card>
     );
   }
