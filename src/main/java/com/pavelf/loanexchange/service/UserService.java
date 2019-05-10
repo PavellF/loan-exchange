@@ -9,8 +9,9 @@ import com.pavelf.loanexchange.security.AuthoritiesConstants;
 import com.pavelf.loanexchange.security.SecurityUtils;
 import com.pavelf.loanexchange.service.dto.UserDTO;
 import com.pavelf.loanexchange.service.util.RandomUtil;
-import com.pavelf.loanexchange.web.rest.errors.*;
-
+import com.pavelf.loanexchange.web.rest.errors.EmailAlreadyUsedException;
+import com.pavelf.loanexchange.web.rest.errors.InvalidPasswordException;
+import com.pavelf.loanexchange.web.rest.errors.LoginAlreadyUsedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.CacheManager;
@@ -111,7 +112,7 @@ public class UserService {
         newUser.setImageUrl(userDTO.getImageUrl());
         newUser.setLangKey(userDTO.getLangKey());
         // new user is not active
-        newUser.setActivated(false);
+        newUser.setActivated(true);
         // new user gets registration key
         newUser.setActivationKey(RandomUtil.generateActivationKey());
         Set<Authority> authorities = new HashSet<>();

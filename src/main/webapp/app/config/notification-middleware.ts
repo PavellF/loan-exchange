@@ -1,9 +1,9 @@
 import { isPromise, translate } from 'react-jhipster';
-import { toast } from 'react-toastify';
+import { message } from 'antd';
 
-const addErrorAlert = (message, key?, data?) => {
-  key = key ? key : message;
-  toast.error(translate(key, data));
+const addErrorAlert = (messageStr, key?, data?) => {
+  key = key ? key : messageStr;
+  message.error(translate(key, data));
 };
 export default () => next => action => {
   // If not a promise, continue on
@@ -19,7 +19,7 @@ export default () => next => action => {
   return next(action)
     .then(response => {
       if (action.meta && action.meta.successMessage) {
-        toast.success(action.meta.successMessage);
+        message.success(action.meta.successMessage);
       } else if (response && response.action && response.action.payload && response.action.payload.headers) {
         const headers = response.action.payload.headers;
         let alert: string = null;
@@ -32,15 +32,14 @@ export default () => next => action => {
           }
         });
         if (alert) {
-          const alertParam = alertParams;
-          toast.success(translate(alert, { param: alertParam }));
+          message.success(translate(alert, { param: alertParams }));
         }
       }
       return Promise.resolve(response);
     })
     .catch(error => {
       if (action.meta && action.meta.errorMessage) {
-        toast.error(action.meta.errorMessage);
+        message.error(action.meta.errorMessage);
       } else if (error && error.response) {
         const response = error.response;
         const data = response.data;
@@ -98,9 +97,9 @@ export default () => next => action => {
           }
         }
       } else if (error && error.message) {
-        toast.error(error.message);
+        message.error(error.message);
       } else {
-        toast.error('Unknown error!');
+        message.error('Unknown error!');
       }
       return Promise.reject(error);
     });

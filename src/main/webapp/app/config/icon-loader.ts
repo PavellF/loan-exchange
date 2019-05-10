@@ -30,7 +30,7 @@ import { faRoad } from '@fortawesome/free-solid-svg-icons/faRoad';
 import { faCloud } from '@fortawesome/free-solid-svg-icons/faCloud';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
-
+//TODO remove
 export const loadIcons = () => {
   library.add(
     faSort,

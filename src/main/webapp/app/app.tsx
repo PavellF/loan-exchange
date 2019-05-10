@@ -6,7 +6,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Card } from 'reactstrap';
 import { BrowserRouter as Router, Redirect, Switch } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import { hot } from 'react-hot-loader';
 
 import { IRootState } from 'app/shared/reducers';
@@ -20,9 +20,8 @@ import ErrorBoundary from 'app/shared/error/error-boundary';
 import { AUTHORITIES } from 'app/config/constants';
 import AppRoutes from 'app/routes';
 import AuthFlow from 'app/shared/layout/authFlow/authFlow';
-import Register from 'app/modules/account/register/register';
 import ErrorBoundaryRoute from 'app/shared/error/error-boundary-route';
-import { LocaleMenu } from 'app/shared/layout/menus';
+import LoadingBar from 'react-redux-loading-bar';
 
 const baseHref = document
   .querySelector('base')
@@ -42,7 +41,7 @@ export class App extends React.Component<IAppProps> {
 
     let pageBody = null;
 
-    if (this.props.isAuthenticated || true) {
+    if (this.props.isAuthenticated) {
       pageBody = (
         <div className="app-container" style={{ paddingTop }}>
           <ToastContainer position={toast.POSITION.TOP_LEFT} className="toastify-container" toastClassName="toastify-toast" />
@@ -70,6 +69,7 @@ export class App extends React.Component<IAppProps> {
       pageBody = (
         <div className="login-flow-container">
           <ErrorBoundary>
+            <LoadingBar className="loading-bar" />
             <Switch>
               <ErrorBoundaryRoute path="/auth" component={AuthFlow} />
               <Redirect to="/auth" />

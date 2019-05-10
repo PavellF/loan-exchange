@@ -1,9 +1,9 @@
 {
   "reset": {
     "request": {
-      "title": "Reset your password",
+      "title": "Reset password",
       "form": {
-        "button": "Reset password"
+        "button": "Reset"
       },
       "messages": {
         "info": "Enter the email address you used to register",

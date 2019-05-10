@@ -10,6 +10,10 @@
   align-items: center;
 }
 
+.card__row_end {
+  justify-content: flex-end;
+}
+
 .register-card__head {
   display: flex;
   flex-flow: column;
@@ -41,8 +45,13 @@
   }
 }
 
-.loading-bar {
-  height: 3px;
-  background-color: #009cd8;
-  z-index: 1031;
+.brands {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0.7rem 0;
+}
+
+.brands > button {
+  margin-right: 10px;
 }

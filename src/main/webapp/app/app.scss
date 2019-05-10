@@ -33,6 +33,12 @@
   }
 }
 
+.loading-bar {
+  height: 3px;
+  background-color: #009cd8;
+  z-index: 1031;
+}
+
 .login-flow-container {
   display: flex;
   align-items: center;

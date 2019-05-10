@@ -1,12 +1,11 @@
 import React, { useEffect, useReducer, useState } from 'react';
-import { Card, Typography } from 'antd';
-import { Brand, BrandIcon } from 'app/shared/layout/header/header-components';
+import { Card } from 'antd';
+import { BrandIcon } from 'app/shared/layout/header/header-components';
 import { getUrlParameter, translate, Translate } from 'react-jhipster';
 import Form from 'antd/lib/form';
 import Input from 'antd/lib/input';
 import Icon from 'antd/lib/icon';
 import Button from 'antd/lib/button';
-import { Link } from 'react-router-dom';
 import './authFlow.scss';
 import { AUTHORITIES } from 'app/config/constants';
 import Row from 'antd/lib/grid/row';
@@ -16,9 +15,9 @@ import PasswordStrengthBar from 'app/shared/layout/password/password-strength-ba
 import { IRootState } from 'app/shared/reducers';
 import { handleRegister, reset } from 'app/modules/account/register/register.reducer';
 import { connect } from 'react-redux';
-import { defaultValue, IUser } from 'app/shared/model/user.model';
-import LoadingBar from 'react-redux-loading-bar';
-import Progress from 'antd/lib/progress';
+import { IUser } from 'app/shared/model/user.model';
+import { handlePasswordResetFinish, handlePasswordResetInit } from 'app/modules/account/password-reset/password-reset.reducer';
+import { login } from 'app/shared/reducers/authentication';
 
 const ENTER_EMAIL = 'ENTER_EMAIL';
 const SELECT_ROLE = 'SELECT_ROLE';
@@ -26,18 +25,42 @@ const ENTER_PASSWORD = 'ENTER_PASSWORD';
 const CREATE_DEBTOR_ACCOUNT = 'CREATE_DEBTOR_ACCOUNT';
 const CREATE_CREDITOR_ACCOUNT = 'CREATE_CREDITOR_ACCOUNT';
 const LEGAL = 'LEGAL';
+const RESET_PASSWORD = 'RESET_PASSWORD';
 
 const GO_BACK = 'GO_BACK';
 const GO_FORWARD = 'GO_FORWARD';
 
 const AuthFlow = props => {
-  const { getFieldDecorator, validateFields, getFieldValue, setFieldsValue } = props.form;
+  const { getFieldDecorator, validateFields, getFieldValue } = props.form;
+  const { location, isAuthenticated } = props;
 
   useEffect(() => {
+    if (props.registrationSuccess) {
+      props.login(getFieldValue('email'), getFieldValue('password'), true);
+    }
+  }, [props.registrationSuccess]);
+
+  useEffect(() => {
+    const { from } = location.state || { from: { pathname: '/', search: location.search } };
+
+    if (isAuthenticated) {
+      props.history.push(from);
+    }
+
     return () => {
       props.reset();
     };
   }, []);
+
+  useEffect(() => {
+    if (props.resetPasswordSuccess) {
+      if (resetKey) {
+        dispatch({ type: GO_FORWARD, payload: ENTER_EMAIL });
+      } else {
+        dispatch({ type: GO_FORWARD, payload: RESET_PASSWORD });
+      }
+    }
+  }, [props.resetPasswordSuccess]);
 
   const reducer = (currentState, action) => {
     if (action.type === GO_BACK && currentState.length > 0) {
@@ -52,19 +75,29 @@ const AuthFlow = props => {
   };
 
   const startCard = getUrlParameter('card', props.location.search);
-  const stack = [ENTER_EMAIL];
+  const resetKey = getUrlParameter('key', props.location.search);
+  const stack = [];
 
-  if (startCard) {
-    stack.push(startCard);
+  if (resetKey) {
+    stack.push(RESET_PASSWORD);
+  } else {
+    stack.push(ENTER_EMAIL);
+    if (startCard) {
+      stack.push(startCard);
+    }
   }
 
   const [flowStack, dispatch] = useReducer(reducer, stack);
   const [showPassword, setShowPassword] = useState(true);
   const [confirmDirty, setConfirmDirty] = useState(false);
 
-  const handleSignIn = event => {
+  const handleLogin = event => {
     event.preventDefault();
-    validateFields();
+    validateFields((err, values) => {
+      if (!err) {
+        props.login(values.email, values.password, values.rememberMe);
+      }
+    });
   };
 
   const handleSignUp = event => {
@@ -89,6 +122,23 @@ const AuthFlow = props => {
         newUser.password = values.password;
 
         props.handleRegister(newUser, token, ref);
+      }
+    });
+  };
+
+  const handlePasswordResetStart = event => {
+    validateFields(['email'], (err, values) => {
+      if (!err) {
+        props.handlePasswordResetInit(getFieldValue('email'));
+      }
+    });
+  };
+
+  const handlePasswordReset = event => {
+    event.preventDefault();
+    validateFields((err, values) => {
+      if (!err) {
+        props.handlePasswordResetFinish(resetKey, values.password);
       }
     });
   };
@@ -124,8 +174,7 @@ const AuthFlow = props => {
   if (flowStack[flowStack.length - 1] === ENTER_EMAIL || flowStack[flowStack.length - 1] === ENTER_PASSWORD) {
     return (
       <Card style={{ width: 400 }}>
-        <Progress percent={50} status="active" showInfo={false} />
-        <Form onSubmit={handleSignIn}>
+        <Form onSubmit={handleLogin}>
           <div className={flowStack[flowStack.length - 1] === ENTER_EMAIL ? 'active' : 'hidden'}>
             <div className="email-card__head">
               <BrandIcon />
@@ -149,6 +198,11 @@ const AuthFlow = props => {
               <p>
                 <Translate contentKey="register.usingAnotherProvider">Or login with:</Translate>
               </p>
+              <div className="brands">
+                <Button shape="circle" icon="facebook" />
+                <Button shape="circle" icon="instagram" />
+                <Button shape="circle" icon="google" />
+              </div>
             </div>
 
             <div className="email-card__row">
@@ -188,10 +242,10 @@ const AuthFlow = props => {
             </Form.Item>
 
             <div className="email-card__row">
-              <a onClick={() => validateAndGoForward(['email', 'password'], CREATE_DEBTOR_ACCOUNT)}>
+              <a onClick={handlePasswordResetStart}>
                 <Translate contentKey="register.forgotPassword">Forgot password?</Translate>
               </a>
-              <Button type="primary" htmlType="submit">
+              <Button loading={props.loginLoading} type="primary" htmlType="submit">
                 <Translate contentKey="entity.action.next">Next</Translate>
               </Button>
             </div>
@@ -207,7 +261,6 @@ const AuthFlow = props => {
   ) {
     return (
       <Card style={{ maxWidth: 450 }}>
-        <LoadingBar className="loading-bar" />
         <Form onSubmit={handleSignUp}>
           <div className={flowStack[flowStack.length - 1] === SELECT_ROLE ? 'active' : 'hidden'}>
             <a onClick={() => dispatch({ type: GO_BACK })}>
@@ -367,7 +420,7 @@ const AuthFlow = props => {
               <a onClick={() => dispatch({ type: GO_FORWARD, payload: ENTER_EMAIL })}>
                 <Translate contentKey="register.signInInstead">Sign in instead</Translate>
               </a>
-              <Button type="primary" htmlType="submit" disabled={!Boolean(getFieldValue('agreement'))}>
+              <Button type="primary" htmlType="submit" loading={props.registrationLoading} disabled={!Boolean(getFieldValue('agreement'))}>
                 <Translate contentKey="entity.action.next">Next</Translate>
               </Button>
             </div>
@@ -392,9 +445,69 @@ const AuthFlow = props => {
         </Form>
       </Card>
     );
+  } else if (flowStack[flowStack.length - 1] === RESET_PASSWORD) {
+    let payload = null;
+
+    if (resetKey) {
+      payload = (
+        <Form onSubmit={handlePasswordReset}>
+          <div className="email-card__head">
+            <BrandIcon />
+            <h1>
+              <Translate contentKey="reset.request.title">Reset password</Translate>
+            </h1>
+          </div>
+
+          <Form.Item label={translate('register.form.password')}>
+            {getFieldDecorator('password', {
+              rules: [
+                { required: true, message: translate('register.messages.validate.password.required') },
+                { validator: validateToNextPassword },
+                { min: 6, message: translate('register.messages.validate.password.minlength') },
+                { max: 64, message: translate('register.messages.validate.password.maxlength') }
+              ]
+            })(<Input.Password size="large" placeholder={translate('register.form.password')} />)}
+          </Form.Item>
+
+          <Form.Item label={translate('register.form.confirmPassword')}>
+            {getFieldDecorator('confirm', {
+              rules: [
+                { required: true, message: translate('register.messages.validate.password.confirm') },
+                { validator: compareToFirstPassword },
+                { min: 6, message: translate('register.messages.validate.password.minlength') },
+                { max: 64, message: translate('register.messages.validate.password.maxlength') }
+              ]
+            })(<Input.Password size="large" onBlur={handleConfirmBlur} placeholder={translate('register.form.confirmPassword')} />)}
+          </Form.Item>
+
+          <div className="email-card__row card__row_end">
+            <Button loading={props.passwordResetLoading} type="primary" htmlType="submit">
+              <Translate contentKey="reset.request.form.button" />
+            </Button>
+          </div>
+        </Form>
+      );
+    } else {
+      payload = (
+        <div className="email-card__head">
+          <BrandIcon />
+          <h1>
+            <Translate contentKey="reset.request.title" />
+          </h1>
+          <p>
+            <Icon type="user" /> {getFieldValue('email')}
+          </p>
+          <p>
+            <Translate contentKey="reset.request.messages.success" />
+          </p>
+        </div>
+      );
+    }
+
+    return <Card style={{ width: 400 }}>{payload}</Card>;
   } else {
     return (
-      <Card style={{ maxWidth: 400 }}>
+      <Card>
         <a onClick={() => dispatch({ type: GO_BACK })}>
           <Icon type="arrow-left" />
         </a>
@@ -403,13 +516,18 @@ const AuthFlow = props => {
   }
 };
 
-const mapStateToProps = ({ locale }: IRootState) => ({
-  currentLocale: locale.currentLocale
+const mapStateToProps = ({ locale, register, passwordReset, authentication }: IRootState) => ({
+  currentLocale: locale.currentLocale,
+  registrationLoading: register.loading,
+  registrationSuccess: register.registrationSuccess,
+  passwordResetLoading: passwordReset.loading,
+  resetPasswordSuccess: passwordReset.resetPasswordSuccess,
+  loginLoading: authentication.loading
 });
 
-const mapDispatchToProps = { handleRegister, reset };
+const mapDispatchToProps = { handleRegister, reset, handlePasswordResetInit, handlePasswordResetFinish, login };
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(Form.create({ name: 'normal_login' })(AuthFlow));
+)(Form.create({ name: 'auth_flow' })(AuthFlow));

@@ -8,6 +8,7 @@ import LoginModal from './login-modal';
 
 export interface ILoginProps extends StateProps, DispatchProps, RouteComponentProps<{}> {}
 
+// TODO remove
 export interface ILoginState {
   showModal: boolean;
 }
