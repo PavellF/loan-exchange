@@ -4,7 +4,7 @@ import 'antd/dist/antd.css';
 
 import React from 'react';
 import { connect } from 'react-redux';
-import { BrowserRouter as Router, Redirect, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Link, Redirect, Switch } from 'react-router-dom';
 import { hot } from 'react-hot-loader';
 
 import { IRootState } from 'app/shared/reducers';
@@ -16,10 +16,11 @@ import { hasAnyAuthority } from 'app/shared/auth/private-route';
 import ErrorBoundary from 'app/shared/error/error-boundary';
 import { AUTHORITIES } from 'app/config/constants';
 import AppRoutes from 'app/routes';
-import AuthFlow from 'app/shared/layout/authFlow/authFlow';
+import AuthFlow from 'app/modules/account/authFlow/authFlow';
 import ErrorBoundaryRoute from 'app/shared/error/error-boundary-route';
 import { AppHeader } from 'app/shared/layout/header/header';
 import { Layout, Menu } from 'antd';
+import Button from 'antd/lib/button';
 
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
@@ -54,27 +55,43 @@ export class App extends React.Component<IAppProps> {
           </ErrorBoundary>
 
           <Layout className="container">
-            <Sider width={200} style={{ background: '#fff', margin: '18px 0' }}>
-              <Menu mode="inline" defaultSelectedKeys={['1']} defaultOpenKeys={['sub1']} style={{ height: '100%', borderRight: 0 }}>
-                <Menu.Item key="1">option1</Menu.Item>
-                <Menu.Item key="2">option2</Menu.Item>
-                <Menu.Item key="3">option3</Menu.Item>
-                <Menu.Item key="4">option4</Menu.Item>
-              </Menu>
+            <Sider width={200} style={{ background: 'transparent', margin: '18px 0' }}>
+              <div className="side-menu">
+                <Link to="/loan">
+                  <Button type="link" size="large" icon="dollar">
+                    My Loans
+                  </Button>
+                </Link>
+                <Button type="link" size="large" icon="wallet">
+                  My Account
+                </Button>
+                <Button type="link" size="large" icon="user">
+                  My Profile
+                </Button>
+                <Button type="link" size="large" icon="message">
+                  My Messages
+                </Button>
+                <Button type="link" size="large" icon="fire">
+                  Rating
+                </Button>
+                <Button type="link" size="large" icon="thunderbolt">
+                  Articles
+                </Button>
+              </div>
             </Sider>
 
-            <Layout style={{ padding: '18px', paddingRight: '0' }}>
-              <Content style={{ background: '#fff', padding: 24, margin: 0, minHeight: '80vh' }}>
-                <ErrorBoundary>
-                  <AppRoutes />
-                </ErrorBoundary>
-              </Content>
+            <Layout style={{ padding: '18px', paddingRight: '0', minHeight: '80vh' }}>
+              <ErrorBoundary>
+                <AppRoutes />
+              </ErrorBoundary>
             </Layout>
           </Layout>
 
-          <Footer oneline currentLocale={this.props.currentLocale} onLocaleChange={this.props.setLocale} />
+          <Layout className="container">
+            <Footer currentLocale={this.props.currentLocale} onLocaleChange={this.props.setLocale} />
+          </Layout>
         </Layout>
-      ); //footer: copyright   up logout gitpage   langs...
+      ); //footer: copyright   up logout gitpage   langs... alivbaba box hsadow
       //HEADER: LOGO     MONEY NOTIFICATIONS PROFILE
     } else {
       pageBody = (

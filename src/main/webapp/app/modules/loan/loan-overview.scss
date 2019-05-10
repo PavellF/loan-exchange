@@ -1,0 +1,22 @@
+.loan-overview {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.loan-overview__bottom {
+  margin: 0;
+  display: flex;
+}
+
+.credit-statistic__bottom {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+.credit-statistic__count {
+  text-align: center;
+  width: 50%;
+}

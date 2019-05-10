@@ -1,11 +1,11 @@
 import './footer.scss';
 
 import React from 'react';
-import { Storage, Translate } from 'react-jhipster';
-import { Col, Row } from 'reactstrap';
+import { Storage } from 'react-jhipster';
 import { LocaleMenu } from 'app/shared/layout/menus';
+import { Button } from 'antd';
 
-const Footer = ({ currentLocale, onLocaleChange, oneline = false }) => {
+const Footer = ({ currentLocale, onLocaleChange, oneline = false, style = { margin: '0.5rem 0' } }) => {
   const handleLocaleChange = value => {
     const langKey = value;
     Storage.session.set('locale', langKey);
@@ -14,31 +14,31 @@ const Footer = ({ currentLocale, onLocaleChange, oneline = false }) => {
 
   if (oneline) {
     return (
-      <footer style={{ margin: '0.5rem 0' }}>
+      <footer className="footer_oneline" style={style}>
         <LocaleMenu maxInline={3} currentLocale={currentLocale} onChange={handleLocaleChange} />
+      </footer>
+    );
+  } else {
+    return (
+      <footer className="footer" style={style}>
+        <div>
+          <span>LoanExchange © {new Date().getFullYear()}</span>
+        </div>
+        <div>
+          <a>Go Up</a>
+          <a>Logout</a>
+        </div>
+        <div>
+          <Button icon="github" shape="circle" />
+          <Button icon="github" shape="circle" />
+          <Button icon="github" shape="circle" />
+        </div>
+        <div>
+          <LocaleMenu maxInline={3} currentLocale={currentLocale} onChange={handleLocaleChange} />
+        </div>
       </footer>
     );
   }
 };
-/*(
-  <div className="footer page-content">
-    <Row>
-      <Col md="4">
-        <span>LoanExchange © {new Date().getFullYear()}</span>
-      </Col>
-      <Col md="4">
-        <span>
-          Go Up | github
-          <Translate contentKey="footer">Your footer</Translate>
-        </span>
-      </Col>
-      <Col md="4">
-        <span>
-          <Translate contentKey="footer">Your footer</Translate>
-        </span>
-      </Col>
-    </Row>
-  </div>
-);*/
 
 export default Footer;

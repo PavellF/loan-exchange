@@ -132,6 +132,12 @@ Generic styles
   margin: auto;
 }
 
+.side-menu {
+  display: flex;
+  flex-flow: column;
+  align-items: flex-start;
+}
+
 /* padding helpers */
 
 @mixin pad($size, $side) {

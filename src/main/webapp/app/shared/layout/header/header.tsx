@@ -38,7 +38,7 @@ export const AppHeader = ({ isAuthenticated, isAdmin, isSwaggerEnabled, isInProd
     <React.Fragment>
       {renderDevRibbon()}
       <LoadingBar className="loading-bar" />
-      <Header style={{ background: 'white' }}>
+      <Header style={{ background: 'white', boxShadow: '2px 2px 3px rgba(0,0,0,.1)' }}>
         <div className="container header">
           <Brand />
           <Menu mode="horizontal" defaultSelectedKeys={['2']} style={{ lineHeight: '64px' }}>
