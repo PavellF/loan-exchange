@@ -33,12 +33,6 @@
   }
 }
 
-.loading-bar {
-  height: 3px;
-  background-color: #009cd8;
-  z-index: 1031;
-}
-
 .login-flow-container {
   display: flex;
   align-items: center;
@@ -131,6 +125,11 @@ Generic styles
 
 .preserve-space {
   white-space: pre-wrap;
+}
+
+.container {
+  width: 1024px;
+  margin: auto;
 }
 
 /* padding helpers */

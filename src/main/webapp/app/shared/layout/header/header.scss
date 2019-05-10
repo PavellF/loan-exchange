@@ -35,3 +35,14 @@ Developement Ribbon
   font-family: initial;
   color: midnightblue;
 }
+
+.loading-bar {
+  height: 3px;
+  background-color: #009cd8;
+  z-index: 1031;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+}
