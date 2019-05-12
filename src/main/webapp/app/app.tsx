@@ -21,6 +21,7 @@ import ErrorBoundaryRoute from 'app/shared/error/error-boundary-route';
 import { AppHeader } from 'app/shared/layout/header/header';
 import { Layout, Menu } from 'antd';
 import Button from 'antd/lib/button';
+import Spin from 'antd/lib/spin';
 
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
@@ -40,6 +41,14 @@ export class App extends React.Component<IAppProps> {
 
   render() {
     let pageBody = null;
+
+    if (!this.props.sessionHasBeenFetched) {
+      return (
+        <div style={{ height: '100vh', textAlign: 'center', background: 'rgba(0,0,0,0.05)' }}>
+          <Spin />
+        </div>
+      );
+    }
 
     if (this.props.isAuthenticated) {
       pageBody = (
@@ -117,7 +126,8 @@ const mapStateToProps = ({ authentication, applicationProfile, locale }: IRootSt
   isAdmin: hasAnyAuthority(authentication.account.authorities, [AUTHORITIES.ADMIN]),
   ribbonEnv: applicationProfile.ribbonEnv,
   isInProduction: applicationProfile.inProduction,
-  isSwaggerEnabled: applicationProfile.isSwaggerEnabled
+  isSwaggerEnabled: applicationProfile.isSwaggerEnabled,
+  sessionHasBeenFetched: authentication.sessionHasBeenFetched
 });
 
 const mapDispatchToProps = { setLocale, getSession, getProfile };

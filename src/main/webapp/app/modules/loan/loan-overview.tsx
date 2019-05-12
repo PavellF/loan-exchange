@@ -5,7 +5,7 @@ import Button from 'antd/lib/button';
 import Icon from 'antd/lib/icon';
 import './loan-overview.scss';
 import { Doughnut } from 'react-chartjs-2';
-import { Loan } from 'app/modules/loan/loan/loan';
+import { LoanCard } from 'app/modules/loan/loan-card/loan-card';
 
 const tabListNoTitle = [
   {
@@ -25,12 +25,12 @@ const tabListNoTitle = [
 const contentListNoTitle = {
   article: (
     <div style={{ display: 'flex', flexFlow: 'column', alignItems: 'center' }}>
-      <div style={{ marginBottom: '24px', width: '100%' }}>
+      <div style={{ marginBottom: '24px' }}>
         <Button size="large" type="dashed" icon="plus">
           New loan
         </Button>
       </div>
-      <Loan style={{ marginBottom: '24px', width: '100%' }} />
+      <LoanCard />
     </div>
   ),
   app: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />,

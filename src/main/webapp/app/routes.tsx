@@ -15,6 +15,7 @@ import ErrorBoundaryRoute from 'app/shared/error/error-boundary-route';
 import PageNotFound from 'app/shared/error/page-not-found';
 import { AUTHORITIES } from 'app/config/constants';
 import LoanOverview from 'app/modules/loan/loan-overview';
+import { Loan } from 'app/modules/loan/loan/loan';
 
 // tslint:disable:space-in-parens
 const Account = Loadable({
@@ -33,6 +34,7 @@ const Routes = () => (
     <Switch>
       <ErrorBoundaryRoute path="/login" component={Login} />
       <ErrorBoundaryRoute path="/logout" component={Logout} />
+      <ErrorBoundaryRoute path="/loan/:id" component={Loan} />
       <ErrorBoundaryRoute path="/loan" component={LoanOverview} />
       <ErrorBoundaryRoute path="/register" component={Register} />
       <ErrorBoundaryRoute path="/activate/:key?" component={Activate} />
