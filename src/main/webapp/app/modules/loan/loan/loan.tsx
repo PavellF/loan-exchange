@@ -4,8 +4,8 @@ import './loan.scss';
 import PageHeader from 'antd/lib/page-header';
 import Tag from 'antd/lib/tag';
 import Button from 'antd/lib/button';
-import Empty from 'antd/lib/empty';
 import { LoanLog } from 'app/modules/loan/loan-log/loan-log';
+import Select from 'antd/lib/select';
 
 export const Loan = props => {
   const [activeTab, setActiveTab] = useState(0);
@@ -23,7 +23,14 @@ export const Loan = props => {
 
   const contentListNoTitle = {
     history: <LoanLog />,
-    graph: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+    graph: (
+      <div>
+        <Select defaultValue="lucy" style={{ width: 120 }} onChange={null}>
+          <Select.Option value="jack">Year</Select.Option>
+          <Select.Option value="lucy">Month</Select.Option>
+        </Select>
+      </div>
+    )
   };
 
   const onTabChange = key => {
@@ -54,6 +61,8 @@ export const Loan = props => {
               <span className="loan-entry__entry">(No) early repayment</span>
               <span className="loan-entry__entry">Start amount: 500</span>
               <span className="loan-entry__entry">Success rate: 3%</span>
+              <span className="loan-entry__entry">Fine: 3%</span>
+              <span className="loan-entry__entry">Earned: 3%</span>
             </div>
             <div className="loan-entry__right">
               <Statistic title="Percent" value="3.4% Per Month" />

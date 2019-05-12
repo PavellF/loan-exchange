@@ -44,7 +44,7 @@ export class App extends React.Component<IAppProps> {
 
     if (!this.props.sessionHasBeenFetched) {
       return (
-        <div style={{ height: '100vh', textAlign: 'center', background: 'rgba(0,0,0,0.05)' }}>
+        <div className="page-loading">
           <Spin />
         </div>
       );
@@ -89,7 +89,7 @@ export class App extends React.Component<IAppProps> {
               </div>
             </Sider>
 
-            <Layout style={{ padding: '18px', paddingRight: '0', minHeight: '80vh' }}>
+            <Layout style={{ padding: '18px', paddingRight: '0', minHeight: 'calc(100vh - 64px - 108px)' }}>
               <ErrorBoundary>
                 <AppRoutes />
               </ErrorBoundary>

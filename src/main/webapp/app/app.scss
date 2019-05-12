@@ -3,6 +3,14 @@
   align-items: center;
 }
 
+.page-loading {
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.05);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 * {
   -moz-box-sizing: border-box;
   box-sizing: border-box;
