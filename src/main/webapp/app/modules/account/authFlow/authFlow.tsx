@@ -6,7 +6,6 @@ import Form from 'antd/lib/form';
 import Input from 'antd/lib/input';
 import Icon from 'antd/lib/icon';
 import Button from 'antd/lib/button';
-import './authFlow.scss';
 import { AUTHORITIES } from 'app/config/constants';
 import Row from 'antd/lib/grid/row';
 import Col from 'antd/lib/grid/col';
