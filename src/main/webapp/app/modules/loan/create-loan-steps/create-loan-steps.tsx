@@ -33,8 +33,8 @@ const CreateLoanSteps = props => {
     if (currentStep === 0) {
       return getFieldValue('credit') <= 0;
     } else if (currentStep === 1) {
-      const number = Number(getFieldValue('rate') || 0);
-      return Number.isNaN(number) || number <= 0;
+      const number = Number(getFieldValue('rate'));
+      return isNaN(number) || number <= 0;
     } else if (currentStep === 2) {
       return getFieldValue('term') <= 0;
     }
@@ -43,7 +43,10 @@ const CreateLoanSteps = props => {
   const getSuccessRate = () => {
     const term = Number(getFieldValue('term'));
     const rate = Number(getFieldValue('rate'));
+    const fine = Number(getFieldValue('fine'));
     const rateType = getFieldValue('rate-type');
+    const earlyPayment: boolean = getFieldValue('earlyPayment');
+    const capitalization: boolean = getFieldValue('capitalization');
     let successRate = 100;
 
     // bigger term - bigger successRate
@@ -66,8 +69,19 @@ const CreateLoanSteps = props => {
       rateAtomic = 18;
     }
 
-    const rateRate = Math.ceil(rateAtomic * rate);
-    successRate = successRate - rateRate;
+    successRate = successRate - rateAtomic * rate;
+
+    if (fine > 0) {
+      successRate = successRate - (rateAtomic + 9) * fine;
+    }
+
+    if (earlyPayment === false) {
+      successRate = successRate - 5;
+    }
+
+    if (capitalization === false) {
+      successRate = successRate - 19;
+    }
 
     let className = null;
 
@@ -81,7 +95,7 @@ const CreateLoanSteps = props => {
 
     return (
       <span>
-        Success rate: <strong className={className}>{`${Math.max(successRate, 0)}%`}</strong>
+        Success rate: <strong className={className}>{`${Math.max(Math.floor(successRate), 1)}%`}</strong>
       </span>
     );
   };
@@ -90,17 +104,29 @@ const CreateLoanSteps = props => {
     const credit = Number(getFieldValue('credit'));
     const rate = Number(getFieldValue('rate'));
     let term = Number(getFieldValue('term'));
-    const rateType = getFieldValue('rate-type');
+    const capitalization: boolean = getFieldValue('capitalization');
+    const rateType: Term = getFieldValue('rate-type');
 
-    if (isNaN(term) || rateType === Term.ALL_PERIOD) {
+    if (rateType === undefined || rateType === Term.ALL_PERIOD) {
       term = 1;
     }
 
-    let profit = Math.round(term * credit * (1 + rate / 100));
-    const fee = Math.round(profit * CREDIT_FEE_PERCENT);
+    let averagePayment;
+    let profit;
+    const percentInPeriod = 1 + rate / 100;
+
+    if (capitalization) {
+      averagePayment = (credit * percentInPeriod ** term * (percentInPeriod - 1)) / (percentInPeriod ** term - 1);
+      profit = averagePayment * term;
+    } else {
+      profit = credit * percentInPeriod ** term;
+      averagePayment = profit / term;
+    }
+
+    const fee = profit * CREDIT_FEE_PERCENT;
 
     if (isNaN(profit)) {
-      return;
+      return { profit: credit, fee: 0, averagePayment: 0 };
     }
 
     if (fee < CREDIT_MIN_FEE) {
@@ -109,11 +135,7 @@ const CreateLoanSteps = props => {
       profit = profit - fee;
     }
 
-    return (
-      <span>
-        Expected profit: {profit}¢. Fee is {fee}¢.
-      </span>
-    );
+    return { profit: Math.round(profit), fee: Math.round(fee), averagePayment: Math.round(averagePayment) };
   };
 
   const getTermSuffix = (): string => {
@@ -133,8 +155,12 @@ const CreateLoanSteps = props => {
 
   const getEndTermDate = () => {
     const term = Number(getFieldValue('term'));
+    // @ts-ignore
     return moment().add(term, getTermSuffix());
   };
+
+  const expectedProfit = getExpectedProfit();
+  const successRate = getSuccessRate();
 
   return (
     <Card>
@@ -165,7 +191,7 @@ const CreateLoanSteps = props => {
 
           <div className={currentStep === 1 ? 'create-loan-active' : 'hidden'}>
             <Form.Item label="Set your rate">
-              {getFieldDecorator('rate', { initialValue: 1 })(
+              {getFieldDecorator('rate', { initialValue: '1' })(
                 <Input
                   size="large"
                   suffix="%"
@@ -180,38 +206,53 @@ const CreateLoanSteps = props => {
                 />
               )}
             </Form.Item>
-            <p>{getExpectedProfit()}</p>
-            <p>{getSuccessRate()}</p>
+            <p>
+              Expected profit: {expectedProfit.profit}¢. Fee is {expectedProfit.fee}¢.
+            </p>
+            <p>{successRate}</p>
           </div>
 
           <div className={currentStep === 2 ? 'create-loan-active' : 'hidden'}>
             <Form.Item label={`Length of term ${getTermSuffix()}`}>
-              {getFieldDecorator('term', {})(<InputNumber style={{ width: '100%' }} size="large" precision={0} min={1} />)}
+              {getFieldDecorator('term', { initialValue: 1 })(<InputNumber style={{ width: '100%' }} size="large" precision={0} min={1} />)}
             </Form.Item>
             <p>{`End date: ${getEndTermDate().calendar()}`}</p>
-            <p>{getExpectedProfit()}</p>
-            <p>{getSuccessRate()}</p>
+            <p>
+              Expected profit: {expectedProfit.profit}¢. Fee is {expectedProfit.fee}¢.
+            </p>
+            <p>{successRate}</p>
           </div>
 
           <div className={currentStep === 3 ? 'create-loan-active' : 'hidden'}>
-            <Form.Item label="Set fine (not recommended)">
-              {getFieldDecorator('fine', { initialValue: 0 })(<InputNumber style={{ width: '100%' }} size="large" precision={0} min={0} />)}
+            <Form.Item label={`Set fine (not recommended)`}>
+              {getFieldDecorator('fine', { initialValue: 0 })(<InputNumber style={{ width: '100%' }} size="large" precision={2} min={0} />)}
             </Form.Item>
-            <p>Fine if debtor could not pay in time.</p>
-            <Form.Item label="Early payment is allowed">
-              {getFieldDecorator('earlyPayment', { valuePropName: 'checked', initialValue: true })(<Switch />)}
-            </Form.Item>
+
+            <p>Some % if debtor could not pay in time.</p>
+
             <Form.Item label="Capitalization">
               {getFieldDecorator('capitalization', { valuePropName: 'checked', initialValue: true })(<Switch />)}
             </Form.Item>
+
+            <Form.Item label="Early payment">
+              {getFieldDecorator('earlyPayment', { valuePropName: 'checked', initialValue: true })(<Switch />)}
+            </Form.Item>
+
             <div>
-              <p>Minamal profit: 1000</p>
-              <p>Overall profit: 1000 tooltip here</p>
-              <p>Success rate: 1000</p>
+              <p>
+                Expected profit: {expectedProfit.profit}¢. Fee is {expectedProfit.fee}¢.
+              </p>
+              <p>Average payment: {expectedProfit.averagePayment}¢.</p>
+              <p>{successRate}</p>
             </div>
           </div>
         </div>
         <div className="create-loan-actions">
+          {currentStep > 0 && (
+            <Button style={{ marginLeft: 8 }} onClick={() => setCurrentStep(old => old - 1)}>
+              Previous
+            </Button>
+          )}
           {currentStep < steps.length - 1 && (
             <Button type="primary" disabled={isNextButtonDisabled()} onClick={goNext}>
               Next
@@ -220,11 +261,6 @@ const CreateLoanSteps = props => {
           {currentStep === steps.length - 1 && (
             <Button htmlType="submit" type="primary" onClick={() => alert('Processing complete!')}>
               Done
-            </Button>
-          )}
-          {currentStep > 0 && (
-            <Button style={{ marginLeft: 8 }} onClick={() => setCurrentStep(old => old - 1)}>
-              Previous
             </Button>
           )}
         </div>
