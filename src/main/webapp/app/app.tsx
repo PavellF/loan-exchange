@@ -83,9 +83,6 @@ export class App extends React.Component<IAppProps> {
                 <Button type="link" size="large" icon="fire">
                   Rating
                 </Button>
-                <Button type="link" size="large" icon="thunderbolt">
-                  Articles
-                </Button>
               </div>
             </Sider>
 

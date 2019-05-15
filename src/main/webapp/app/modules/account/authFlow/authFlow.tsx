@@ -103,7 +103,6 @@ const AuthFlow = props => {
     event.preventDefault();
     validateFields((err, values) => {
       if (!err) {
-        const token = getUrlParameter('token', props.location.search);
         const ref = getUrlParameter('ref', props.location.search);
         let role = AUTHORITIES.CREDITOR;
 
@@ -120,7 +119,7 @@ const AuthFlow = props => {
         newUser.authorities = [role];
         newUser.password = values.password;
 
-        props.handleRegister(newUser, token, ref);
+        props.handleRegister(newUser, ref);
       }
     });
   };

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { translate } from 'react-jhipster';
 
-import { REQUEST, SUCCESS, FAILURE } from 'app/shared/reducers/action-type.util';
+import { FAILURE, REQUEST, SUCCESS } from 'app/shared/reducers/action-type.util';
 import { IUser } from 'app/shared/model/user.model';
 
 export const ACTION_TYPES = {
@@ -47,14 +47,14 @@ export default (state: RegisterState = initialState, action): RegisterState => {
 };
 
 // Actions
-export const handleRegister = (user: IUser, token = '', ref = '') => {
+export const handleRegister = (user: IUser, ref = '') => {
   if (!user.langKey) {
     user.langKey = 'en';
   }
 
   return {
     type: ACTION_TYPES.CREATE_ACCOUNT,
-    payload: axios.post(`api/register?ref=${ref}&token=${token}`, user),
+    payload: axios.post(`api/register?ref=${ref}`, user),
     meta: {
       successMessage: translate('register.messages.success')
     }

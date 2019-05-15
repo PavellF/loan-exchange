@@ -89,7 +89,20 @@
 .create-loan-active {
   display: flex;
   flex-flow: column;
-  align-items: center;
+}
+
+.create-loan-summary {
+  width: 100%;
+  display: flex;
+  flex-flow: row;
+  justify-content: space-around;
+}
+
+.create-loan-summary__column {
+  display: flex;
+  justify-content: space-between;
+  height: 100%;
+  flex-flow: column;
 }
 
 .page-loading {

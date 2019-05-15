@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Form, Steps } from 'antd';
+import { Form, Statistic, Steps } from 'antd';
 import Button from 'antd/lib/button';
 import Card from 'antd/lib/card';
 import InputNumber from 'antd/lib/input-number';
@@ -8,6 +8,7 @@ import Select from 'antd/lib/select';
 import Switch from 'antd/lib/switch';
 import moment from 'moment';
 import { CREDIT_FEE_PERCENT, CREDIT_MIN_FEE } from 'app/config/constants';
+import Icon from 'antd/lib/icon';
 
 enum Term {
   DAY,
@@ -17,16 +18,33 @@ enum Term {
 }
 
 const Step = Steps.Step;
-const steps = ['Amount', 'Rate', 'Term', 'Options', 'Review'];
+const steps = ['Amount', 'Rate', 'Term', 'Options', 'Summary'];
 
 const CreateLoanSteps = props => {
-  const { getFieldDecorator, getFieldValue, setFields } = props.form;
+  const { getFieldDecorator, getFieldValue, validateFields } = props.form;
   const { balance = 1000 } = props;
 
   const [currentStep, setCurrentStep] = useState(0);
 
   const goNext = () => {
-    setCurrentStep(old => old + 1);
+    if (currentStep === 2) {
+      setCurrentStep(4);
+    } else {
+      setCurrentStep(old => old + 1);
+    }
+  };
+
+  const goBack = () => {
+    setCurrentStep(old => old - 1);
+  };
+
+  const handleFormSubmission = event => {
+    event.preventDefault();
+    validateFields((err, values) => {
+      if (!err) {
+        alert(values.valueOf());
+      }
+    });
   };
 
   const isNextButtonDisabled = (): boolean => {
@@ -126,7 +144,7 @@ const CreateLoanSteps = props => {
     const fee = profit * CREDIT_FEE_PERCENT;
 
     if (isNaN(profit)) {
-      return { profit: credit, fee: 0, averagePayment: 0 };
+      return { profit: credit, fee: 0, averagePayment: 0, profitInPercent: 0 };
     }
 
     if (fee < CREDIT_MIN_FEE) {
@@ -135,7 +153,9 @@ const CreateLoanSteps = props => {
       profit = profit - fee;
     }
 
-    return { profit: Math.round(profit), fee: Math.round(fee), averagePayment: Math.round(averagePayment) };
+    const profitInPercent = (profit / credit) * 100 - 100;
+
+    return { profit: Math.round(profit), fee: Math.round(fee), averagePayment: Math.round(averagePayment), profitInPercent };
   };
 
   const getTermSuffix = (): string => {
@@ -143,11 +163,11 @@ const CreateLoanSteps = props => {
     let suffix = '';
 
     if (rateType === Term.ALL_PERIOD || rateType === Term.DAY) {
-      suffix = 'days';
+      suffix = 'day';
     } else if (rateType === Term.YEAR) {
-      suffix = 'years';
+      suffix = 'year';
     } else if (rateType === Term.MONTH) {
-      suffix = 'months';
+      suffix = 'month';
     }
 
     return suffix;
@@ -161,10 +181,11 @@ const CreateLoanSteps = props => {
 
   const expectedProfit = getExpectedProfit();
   const successRate = getSuccessRate();
+  const termSuffix = getTermSuffix();
 
   return (
     <Card>
-      <Form onSubmit={null}>
+      <Form onSubmit={handleFormSubmission}>
         <Steps current={currentStep}>
           {steps.map(item => (
             <Step key={item} title={item} />
@@ -176,7 +197,7 @@ const CreateLoanSteps = props => {
               {getFieldDecorator('credit', { initialValue: balance })(
                 <InputNumber
                   formatter={value => `¢ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                  parser={value => value.replace(/\¢\s?|(,*)/g, '')}
+                  parser={value => Number(value.replace(/\¢\s?|(,*)/g, ''))}
                   style={{ width: '100%' }}
                   size="large"
                   precision={0}
@@ -185,7 +206,7 @@ const CreateLoanSteps = props => {
                 />
               )}
             </Form.Item>
-            <p>Allowed to spend: 1000¢</p>
+            <p>Allowed to spend: {balance}¢</p>
             <Button type="primary">Recharge</Button>
           </div>
 
@@ -213,7 +234,7 @@ const CreateLoanSteps = props => {
           </div>
 
           <div className={currentStep === 2 ? 'create-loan-active' : 'hidden'}>
-            <Form.Item label={`Length of term ${getTermSuffix()}`}>
+            <Form.Item label={`Length of term ${termSuffix}s`}>
               {getFieldDecorator('term', { initialValue: 1 })(<InputNumber style={{ width: '100%' }} size="large" precision={0} min={1} />)}
             </Form.Item>
             <p>{`End date: ${getEndTermDate().calendar()}`}</p>
@@ -238,18 +259,48 @@ const CreateLoanSteps = props => {
               {getFieldDecorator('earlyPayment', { valuePropName: 'checked', initialValue: true })(<Switch />)}
             </Form.Item>
 
-            <div>
-              <p>
-                Expected profit: {expectedProfit.profit}¢. Fee is {expectedProfit.fee}¢.
-              </p>
-              <p>Average payment: {expectedProfit.averagePayment}¢.</p>
-              <p>{successRate}</p>
+            <p>
+              Expected profit: {expectedProfit.profit}¢. Fee is {expectedProfit.fee}¢.
+            </p>
+            <p>Average payment: {expectedProfit.averagePayment}¢.</p>
+            <p>{successRate}</p>
+          </div>
+
+          <div className={currentStep === 4 ? 'create-loan-active create-loan-summary' : 'hidden'}>
+            <div className="create-loan-summary__column">
+              <Statistic title="Amount" value={getFieldValue('credit')} suffix={`¢`} />
+              <Statistic
+                title="Revenue"
+                value={expectedProfit.profit}
+                suffix={
+                  <Statistic
+                    value={expectedProfit.profitInPercent}
+                    precision={2}
+                    valueStyle={{ color: expectedProfit.profitInPercent > 0 ? '#3f8600' : '#cf1322' }}
+                    prefix={expectedProfit.profitInPercent > 0 ? <Icon type="arrow-up" /> : <Icon type="arrow-down" />}
+                    suffix="%"
+                  />
+                }
+              />
+              <Statistic title="Rate" value={getFieldValue('rate')} suffix={`% per ${termSuffix}`} />
+            </div>
+
+            <div className="create-loan-summary__column">
+              <Statistic title="Term" value={getFieldValue('term')} suffix={`${termSuffix}`} />
+              <Statistic title="Fee" value={expectedProfit.fee} suffix={`¢`} />
+              <Statistic title="Average payment" value={expectedProfit.averagePayment} suffix={`¢ in ${termSuffix}`} />
+            </div>
+
+            <div className="create-loan-summary__column">
+              <Statistic title="Capitalization" value={getFieldValue('capitalization') ? 'Yes' : 'No'} />
+              <Statistic title="Early payment" value={getFieldValue('earlyPayment') ? 'Yes' : 'No'} />
+              <Statistic title="Fine" value={getFieldValue('fine')} suffix={`%`} />
             </div>
           </div>
         </div>
         <div className="create-loan-actions">
           {currentStep > 0 && (
-            <Button style={{ marginLeft: 8 }} onClick={() => setCurrentStep(old => old - 1)}>
+            <Button style={{ marginRight: 8 }} onClick={goBack}>
               Previous
             </Button>
           )}
@@ -259,7 +310,7 @@ const CreateLoanSteps = props => {
             </Button>
           )}
           {currentStep === steps.length - 1 && (
-            <Button htmlType="submit" type="primary" onClick={() => alert('Processing complete!')}>
+            <Button htmlType="submit" type="primary">
               Done
             </Button>
           )}
