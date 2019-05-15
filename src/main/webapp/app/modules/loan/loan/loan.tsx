@@ -1,10 +1,9 @@
 import { Card, Statistic } from 'antd';
 import React, { useState } from 'react';
-import './loan.scss';
 import PageHeader from 'antd/lib/page-header';
 import Tag from 'antd/lib/tag';
 import Button from 'antd/lib/button';
-import { LoanLog } from 'app/modules/loan/loan-log/loan-log';
+import { NumericLogList } from 'app/shared/numeric-log/numeric-log';
 import Select from 'antd/lib/select';
 
 export const Loan = props => {
@@ -22,7 +21,7 @@ export const Loan = props => {
   ];
 
   const contentListNoTitle = {
-    history: <LoanLog />,
+    history: <NumericLogList />,
     graph: (
       <div>
         <Select defaultValue="lucy" style={{ width: 120 }} onChange={null}>

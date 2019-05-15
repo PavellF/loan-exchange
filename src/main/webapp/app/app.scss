@@ -423,6 +423,71 @@ Metrics and Health styles
   min-width: 400px;
 }
 
+/* ==========================================================================
+Loan Entry styles
+========================================================================== */
+
+.loan-entry {
+  display: flex;
+  justify-content: space-between;
+}
+
+.loan-entry__left {
+  display: flex;
+  flex-flow: column;
+  flex-wrap: wrap;
+}
+
+.loan-entry__right {
+  display: flex;
+}
+
+.loan-entry__right > div {
+  margin-right: 1rem;
+}
+
+.loan-entry__entry {
+  display: block;
+  margin: 4px 0px;
+}
+
+/* ==========================================================================
+Loan Overview styles
+========================================================================== */
+
+.loan-overview {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.loan-overview__bottom {
+  margin: 0;
+  display: flex;
+}
+
+.credit-statistic__bottom {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+.credit-statistic__count {
+  text-align: center;
+  width: 50%;
+}
+
+/* ==========================================================================
+Account page styles
+========================================================================== */
+
+.account-overview {
+  display: flex;
+  justify-content: space-evenly;
+  padding: 1.5rem 0;
+}
+
 /* bootstrap 3 input-group 100% width
 http://stackoverflow.com/questions/23436430/bootstrap-3-input-group-100-width */
 

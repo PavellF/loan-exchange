@@ -3,7 +3,6 @@ import { Card, Statistic } from 'antd';
 import Empty from 'antd/lib/empty';
 import Button from 'antd/lib/button';
 import Icon from 'antd/lib/icon';
-import './loan-overview.scss';
 import { Doughnut } from 'react-chartjs-2';
 import { LoanCard } from 'app/modules/loan/loan-card/loan-card';
 
@@ -63,7 +62,7 @@ const LoanOverview = () => {
           </div>
           <div className="loan-overview__bottom">
             <div style={{ marginRight: '24px' }}>
-              <Statistic title="Allowed to spend balance" value={112893} />
+              <Statistic title="Allowed to spend balance" value={112893} suffix={'¢'} />
               <Button style={{ marginTop: 16 }} type="primary">
                 Recharge
               </Button>

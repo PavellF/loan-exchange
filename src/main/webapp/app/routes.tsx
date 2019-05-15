@@ -17,6 +17,7 @@ import { AUTHORITIES } from 'app/config/constants';
 import LoanOverview from 'app/modules/loan/loan-overview';
 import { Loan } from 'app/modules/loan/loan/loan';
 import CreateLoanSteps from 'app/modules/loan/create-loan-steps/create-loan-steps';
+import AccountOverview from 'app/modules/account/account/account-overview';
 
 // tslint:disable:space-in-parens
 const Account = Loadable({
@@ -35,6 +36,7 @@ const Routes = () => (
     <Switch>
       <ErrorBoundaryRoute path="/login" component={Login} />
       <ErrorBoundaryRoute path="/logout" component={Logout} />
+      <ErrorBoundaryRoute path="/account" component={AccountOverview} />
       <ErrorBoundaryRoute path="/loan/new" component={CreateLoanSteps} />
       <ErrorBoundaryRoute path="/loan/:id" component={Loan} />
       <ErrorBoundaryRoute path="/loan" component={LoanOverview} />

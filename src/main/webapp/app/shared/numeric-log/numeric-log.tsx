@@ -11,17 +11,12 @@ const getPercentageDifference = percent =>
     <Statistic value={Math.abs(percent)} precision={2} valueStyle={{ color: '#cf1322' }} prefix={<Icon type="arrow-down" />} suffix="%" />
   );
 
-const Log = (item: LoanLogEntity, initialAmount: number) => {
-  let typeAndDate = `${item.type.toString()} from `;
-
-  if (item.type === PaymentType.FINE) {
-  } else if (item.type === PaymentType.PERCENT) {
-  } else if (item.type === PaymentType.REPAYMENT) {
-  }
+export const NumericLog = (item: NumericLogEntity) => {
+  const typeAndDate = `${item.type} from `;
 
   return (
     <List.Item key={item.id} style={{ display: 'flex', justifyContent: 'space-between' }}>
-      <Statistic title={item.type.toLocaleString()} value={item.date.toDateString()} />
+      <Statistic title={typeAndDate} value={item.date.toDateString()} />
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         <Statistic title={'Account'} value={item.difference + '¢'} suffix={getPercentageDifference(item.percentageChange)} />
         <Statistic
@@ -41,36 +36,36 @@ enum PaymentType {
   FINE
 }
 
-class LoanLogEntity {
+export class NumericLogEntity {
   id: number;
   date: Date;
   amountChanged: number;
-  overallAmount: number;
-  type: PaymentType;
+  amountBeforeChange: number;
+  type: string;
 
   get percentageChange() {
-    return ((this.difference - this.overallAmount) / Math.abs(this.overallAmount)) * 100;
+    return ((this.difference - this.amountBeforeChange) / Math.abs(this.amountBeforeChange)) * 100;
   }
 
   get difference() {
-    return this.overallAmount + this.amountChanged;
+    return this.amountBeforeChange + this.amountChanged;
   }
 }
 
-export const LoanLog = props => {
-  const logs: LoanLogEntity[] = [];
-  const a = new LoanLogEntity();
+export const NumericLogList = props => {
+  const logs: NumericLogEntity[] = [];
+  const a = new NumericLogEntity();
   a.id = 1;
   a.date = new Date();
   a.amountChanged = -2;
-  a.type = PaymentType.FINE;
-  a.overallAmount = 1000;
+  a.type = 'fine';
+  a.amountBeforeChange = 1000;
   logs.push(a);
 
   let content = <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />;
   //TODO implement infinite scrolling
   if (logs.length) {
-    content = <List size="large" bordered dataSource={logs} renderItem={Log} />;
+    content = <List size="large" bordered dataSource={logs} renderItem={NumericLog} />;
   }
 
   return content;
