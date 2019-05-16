@@ -1,7 +1,7 @@
 import { Card, Statistic } from 'antd';
 import React from 'react';
 import Icon from 'antd/lib/icon';
-
+// TODO rename to entry
 export const LoanCard = props => {
   const gridStyle = {
     width: '100%',

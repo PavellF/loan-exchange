@@ -19,7 +19,7 @@ const contentList = {
   graph: <NumericLogGraph />
 };
 
-const AccountLogs = props => {
+const NumericLogCard = props => {
   const [activeTab, setActiveTab] = useState(tabList[0].key);
 
   return (
@@ -29,4 +29,4 @@ const AccountLogs = props => {
   );
 };
 
-export default AccountLogs;
+export default NumericLogCard;

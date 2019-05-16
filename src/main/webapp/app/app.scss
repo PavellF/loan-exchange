@@ -237,11 +237,6 @@ Generic styles
   white-space: pre-wrap;
 }
 
-.container {
-  width: 1024px;
-  margin: auto;
-}
-
 .side-menu {
   display: flex;
   flex-flow: column;
@@ -397,6 +392,23 @@ a.anchor-btn:hover {
 }
 
 /* ==========================================================================
+Layout styles
+========================================================================== */
+
+.container {
+  width: 1024px;
+  margin: auto;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #e4e8ed;
+  padding: 24px 15px 35px;
+}
+
+/* ==========================================================================
 Metrics and Health styles
 ========================================================================== */
 
@@ -466,16 +478,44 @@ Loan Overview styles
   display: flex;
 }
 
-.credit-statistic__bottom {
+.loan-statistics {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  margin-top: 1rem;
+  margin-top: 1.5rem;
 }
 
-.credit-statistic__count {
+.loan-statistics__entry {
   text-align: center;
   width: 50%;
+}
+
+.loan-details__card-row {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.loan-details__card-column {
+  display: flex;
+  flex-flow: column;
+  width: 50%;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.loan-details__card-ceil {
+  text-align: center;
+}
+
+.loan-list__tab-body {
+  display: flex;
+  flex-flow: column;
+}
+
+.loan-list__tab-body-head {
+  margin-bottom: 24px;
+  align-self: center;
 }
 
 /* ==========================================================================

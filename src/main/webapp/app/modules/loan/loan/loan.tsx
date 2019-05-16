@@ -1,87 +1,56 @@
 import { Card, Statistic } from 'antd';
-import React, { useState } from 'react';
-import PageHeader from 'antd/lib/page-header';
+import React from 'react';
 import Tag from 'antd/lib/tag';
 import Button from 'antd/lib/button';
-import { NumericLogList } from 'app/shared/numeric-log/numeric-log';
-import Select from 'antd/lib/select';
+import NumericLogCard from 'app/shared/numeric-log-card/account-logs';
+import LoanStatistics from 'app/modules/loan/loan-statistics/loan-statistics';
+import Switch from 'antd/lib/switch';
 
 export const Loan = props => {
-  const [activeTab, setActiveTab] = useState(0);
+  let cardBottom = null;
 
-  const tabListNoTitle = [
-    {
-      key: 'history',
-      tab: 'History'
-    },
-    {
-      key: 'graph',
-      tab: 'Graph'
-    }
-  ];
-
-  const contentListNoTitle = {
-    history: <NumericLogList />,
-    graph: (
-      <div>
-        <Select defaultValue="lucy" style={{ width: 120 }} onChange={null}>
-          <Select.Option value="jack">Year</Select.Option>
-          <Select.Option value="lucy">Month</Select.Option>
-        </Select>
-      </div>
-    )
-  };
-
-  const onTabChange = key => {
-    const nextActiveTab = tabListNoTitle.findIndex(tab => tab.key === key);
-    if (nextActiveTab !== -1) {
-      setActiveTab(nextActiveTab);
-    }
-  };
+  if (true) {
+    cardBottom = (
+      <>
+        Автоплатеж
+        <Switch defaultChecked onChange={null} />
+        <Button style={{ marginLeft: '1rem' }} type="primary">
+          Оплатить
+        </Button>
+      </>
+    );
+  } else {
+    cardBottom = <Button type="danger">Delete</Button>;
+  }
 
   return (
     <React.Fragment>
-      <PageHeader
-        onBack={() => props.history.push('/loan')}
-        title="Loan Details"
-        subTitle="id214324"
-        tags={<Tag color="red">Pending</Tag>}
-        extra={[
-          <Button key="1" type="danger">
-            Delete
-          </Button>
-        ]}
-      >
-        <div>
-          <div className="loan-entry">
-            <div className="loan-entry__left">
-              <span className="loan-entry__entry">Date Open: 18 April 2020</span>
-              <span className="loan-entry__entry">Expected fullfillment date: 31 April 2020</span>
-              <span className="loan-entry__entry">(No) early repayment</span>
-              <span className="loan-entry__entry">Start amount: 500</span>
-              <span className="loan-entry__entry">Success rate: 3%</span>
-              <span className="loan-entry__entry">Fine: 3%</span>
-              <span className="loan-entry__entry">Earned: 3%</span>
+      <div className="loan-overview">
+        <Card bordered={false} title="Loan Details" style={{ marginRight: '2%', width: '49%' }} extra={<Tag color="red">Pending</Tag>}>
+          <div className="loan-details__card-row">
+            <div className="loan-details__card-column">
+              <Statistic className="loan-details__card-ceil" title="Взято" value="12 апрель 2020" />
+              <Statistic className="loan-details__card-ceil" title="капитализация" value={'да'} />
+              <Statistic className="loan-details__card-ceil" title="Ставка" value="3.4%" suffix="в месяц" />
+              <Statistic className="loan-details__card-ceil" title="Штраф" value="3.4" suffix="%" />
             </div>
-            <div className="loan-entry__right">
-              <Statistic title="Percent" value="3.4% Per Month" />
-              <Statistic title="Balance" prefix="¢" value={568.08} />
+
+            <div className="loan-details__card-column">
+              <Statistic className="loan-details__card-ceil" title="Дата открытия" value="10 май 2012" />
+              <Statistic className="loan-details__card-ceil" title="досрочное погашение" value="да" />
+              <Statistic className="loan-details__card-ceil" title="Успех" value="88" suffix="%" />
+              <Statistic className="loan-details__card-ceil" title="продолжифтеность" value="8" suffix="месяцев" />
             </div>
           </div>
-        </div>
-      </PageHeader>
 
-      <Card
-        style={{ width: '100%', marginTop: '1rem' }}
-        tabList={tabListNoTitle}
-        activeTabKey={tabListNoTitle[activeTab].key}
-        onTabChange={key => {
-          onTabChange(key);
-        }}
-        bordered={false}
-      >
-        {contentListNoTitle[tabListNoTitle[activeTab].key]}
-      </Card>
+          <div style={{ marginTop: '1rem', textAlign: 'right' }}>{cardBottom}</div>
+        </Card>
+        <Card title="Credit statistic" bordered={false} style={{ width: '49%' }}>
+          <LoanStatistics />
+        </Card>
+      </div>
+
+      <NumericLogCard />
     </React.Fragment>
   );
 };

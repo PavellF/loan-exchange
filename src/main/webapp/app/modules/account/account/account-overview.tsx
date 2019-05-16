@@ -1,6 +1,6 @@
 import React from 'react';
 import Overview from 'app/modules/account/account/overview/overview';
-import AccountLogs from 'app/modules/account/account/logs/account-logs';
+import AccountLogs from 'app/shared/numeric-log-card/account-logs';
 
 const AccountOverview = props => {
   return (

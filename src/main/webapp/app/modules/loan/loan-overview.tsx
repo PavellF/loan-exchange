@@ -1,51 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, Statistic } from 'antd';
-import Empty from 'antd/lib/empty';
 import Button from 'antd/lib/button';
 import Icon from 'antd/lib/icon';
-import { Doughnut } from 'react-chartjs-2';
-import { LoanCard } from 'app/modules/loan/loan-card/loan-card';
-
-const tabListNoTitle = [
-  {
-    key: 'article',
-    tab: 'article'
-  },
-  {
-    key: 'app',
-    tab: 'app'
-  },
-  {
-    key: 'project',
-    tab: 'project'
-  }
-];
-
-const contentListNoTitle = {
-  article: (
-    <div style={{ display: 'flex', flexFlow: 'column', alignItems: 'center' }}>
-      <div style={{ marginBottom: '24px' }}>
-        <Button size="large" type="dashed" icon="plus">
-          New loan
-        </Button>
-      </div>
-      <LoanCard />
-    </div>
-  ),
-  app: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />,
-  project: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
-};
+import LoanListCard from 'app/modules/loan/loan-list-card/loan-list-card';
+import LoanStatistics from 'app/modules/loan/loan-statistics/loan-statistics';
 
 const LoanOverview = () => {
-  const [activeTab, setActiveTab] = useState(0);
-
-  const onTabChange = key => {
-    const nextActiveTab = tabListNoTitle.findIndex(tab => tab.key === key);
-    if (nextActiveTab !== -1) {
-      setActiveTab(nextActiveTab);
-    }
-  };
-
   return (
     <div>
       <div className="loan-overview">
@@ -72,50 +32,12 @@ const LoanOverview = () => {
             </div>
           </div>
         </Card>
-        <Card style={{ width: '49%' }} title="Credit statistic" bordered={false}>
-          <Doughnut
-            options={{
-              rotation: 1 * Math.PI,
-              circumference: 1 * Math.PI
-            }}
-            data={{
-              labels: ['Red', 'Blue', 'Yellow', 'Green'],
-              datasets: [
-                {
-                  label: '# of Votes',
-                  data: [12, 19, 3, 5],
-                  backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)'
-                  ],
-                  borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)', 'rgba(75, 192, 192, 1)'],
-                  borderWidth: 1
-                }
-              ]
-            }}
-          />
-          <div className="credit-statistic__bottom">
-            <Statistic className="credit-statistic__count" title="Active" value={93} suffix="/ 100" />
-            <Statistic className="credit-statistic__count" title="Pending" value={93} suffix="/ 100" />
-            <Statistic className="credit-statistic__count" title="Success" value={93} suffix="/ 100" />
-            <Statistic className="credit-statistic__count" title="Fail" value={93} suffix="/ 100" />
-          </div>
+        <Card title="Credit statistic" bordered={false} style={{ width: '49%' }}>
+          <LoanStatistics />
         </Card>
       </div>
 
-      <Card
-        style={{ width: '100%' }}
-        tabList={tabListNoTitle}
-        activeTabKey={tabListNoTitle[activeTab].key}
-        onTabChange={key => {
-          onTabChange(key);
-        }}
-        bordered={false}
-      >
-        {contentListNoTitle[tabListNoTitle[activeTab].key]}
-      </Card>
+      <LoanListCard />
     </div>
   );
 };

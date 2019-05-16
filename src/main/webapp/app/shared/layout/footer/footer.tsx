@@ -1,5 +1,3 @@
-import './footer.scss';
-
 import React from 'react';
 import { Storage } from 'react-jhipster';
 import { LocaleMenu } from 'app/shared/layout/menus';
@@ -25,12 +23,12 @@ const Footer = ({ currentLocale, onLocaleChange, oneline = false, style = { marg
           <span>LoanExchange © {new Date().getFullYear()}</span>
         </div>
         <div>
-          <a>Go Up</a>
+          <a style={{ marginRight: '12px' }}>Go Up</a>
           <a>Logout</a>
         </div>
         <div>
-          <Button icon="github" shape="circle" />
-          <Button icon="github" shape="circle" />
+          <Button style={{ marginRight: '6px' }} icon="github" shape="circle" />
+          <Button style={{ marginRight: '6px' }} icon="github" shape="circle" />
           <Button icon="github" shape="circle" />
         </div>
         <div>
