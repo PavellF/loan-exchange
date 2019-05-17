@@ -18,6 +18,7 @@ import LoanOverview from 'app/modules/loan/loan-overview';
 import { Loan } from 'app/modules/loan/loan/loan';
 import CreateLoanSteps from 'app/modules/loan/create-loan-steps/create-loan-steps';
 import AccountOverview from 'app/modules/account/account/account-overview';
+import NotificationOverview from 'app/modules/notification/notification-overview';
 
 // tslint:disable:space-in-parens
 const Account = Loadable({
@@ -37,6 +38,7 @@ const Routes = () => (
       <ErrorBoundaryRoute path="/login" component={Login} />
       <ErrorBoundaryRoute path="/logout" component={Logout} />
       <ErrorBoundaryRoute path="/account" component={AccountOverview} />
+      <ErrorBoundaryRoute path="/notifications" component={NotificationOverview} />
       <ErrorBoundaryRoute path="/loan/new" component={CreateLoanSteps} />
       <ErrorBoundaryRoute path="/loan/:id" component={Loan} />
       <ErrorBoundaryRoute path="/loan" component={LoanOverview} />

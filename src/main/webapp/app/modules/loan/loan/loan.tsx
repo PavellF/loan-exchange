@@ -12,7 +12,7 @@ export const Loan = props => {
   if (true) {
     cardBottom = (
       <>
-        Автоплатеж
+        <span style={{ marginRight: '0.5rem' }}>Автоплатеж</span>
         <Switch defaultChecked onChange={null} />
         <Button style={{ marginLeft: '1rem' }} type="primary">
           Оплатить
@@ -45,6 +45,7 @@ export const Loan = props => {
 
           <div style={{ marginTop: '1rem', textAlign: 'right' }}>{cardBottom}</div>
         </Card>
+
         <Card title="Credit statistic" bordered={false} style={{ width: '49%' }}>
           <LoanStatistics />
         </Card>

@@ -471,6 +471,7 @@ Loan Overview styles
   display: flex;
   flex-wrap: wrap;
   margin-bottom: 24px;
+  align-items: flex-start;
 }
 
 .loan-overview__bottom {
@@ -516,6 +517,16 @@ Loan Overview styles
 .loan-list__tab-body-head {
   margin-bottom: 24px;
   align-self: center;
+}
+
+/* ==========================================================================
+Notifications page styles
+========================================================================== */
+
+.notification-card__content {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
 }
 
 /* ==========================================================================

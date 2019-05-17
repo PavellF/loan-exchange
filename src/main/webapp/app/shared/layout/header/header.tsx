@@ -48,11 +48,11 @@ export const AppHeader = ({ isAuthenticated, isAdmin, isSwaggerEnabled, isInProd
               <Link to="/loan">8 967 ¢</Link>
             </Menu.Item>
             <Menu.Item key="2">
-              <Badge count={5}>
-                <a href="#" className="head-example">
+              <Link to="/notifications">
+                <Badge count={5}>
                   <Icon type="notification" />
-                </a>
-              </Badge>
+                </Badge>
+              </Link>
             </Menu.Item>
             <Menu.Item key="3">
               <Link to="/account">
