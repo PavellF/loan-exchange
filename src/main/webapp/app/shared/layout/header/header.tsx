@@ -1,7 +1,4 @@
-import './header.scss';
-
 import React from 'react';
-import { Translate } from 'react-jhipster';
 import LoadingBar from 'react-redux-loading-bar';
 
 import { Brand } from './header-components';
@@ -10,6 +7,7 @@ import Avatar from 'antd/lib/avatar';
 import { Link } from 'react-router-dom';
 import Badge from 'antd/lib/badge';
 import Icon from 'antd/lib/icon';
+import Translate from 'app/shared/language/translate';
 
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;

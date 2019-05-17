@@ -1,5 +1,6 @@
-import { isPromise, translate } from 'react-jhipster';
 import { message } from 'antd';
+import { translate } from 'app/shared/language';
+import { isPromise } from 'app/shared/util/promise-utils';
 
 const addErrorAlert = (messageStr, key?, data?) => {
   key = key ? key : messageStr;

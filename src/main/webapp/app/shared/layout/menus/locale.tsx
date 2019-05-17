@@ -1,7 +1,7 @@
 import React from 'react';
-import { locales, languages } from 'app/config/translation';
+import { languages, locales } from 'app/config/translation';
 import { Select } from 'antd';
-import { Translate } from 'react-jhipster';
+import { Translate } from 'app/shared/language';
 
 export const LocaleMenu = ({ currentLocale, onChange, maxInline = 0 }) => {
   if (Object.keys(languages).length < 2) return;

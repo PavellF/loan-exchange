@@ -1,6 +1,5 @@
 import axios from 'axios';
-import { getBasePath, Storage } from 'react-jhipster';
-
+import { Storage } from 'app/shared/util/storage-util';
 import { SERVER_API_URL } from 'app/config/constants';
 
 const TIMEOUT = 1 * 60 * 1000;

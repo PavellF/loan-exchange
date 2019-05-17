@@ -1,9 +1,10 @@
 import React from 'react';
 import { NavLink as Link } from 'react-router-dom';
+import { Icon } from 'antd';
 
 export const BrandIcon = props => (
-  <div {...props}>
-    <span className="brand">loanExchange</span>
+  <div className="brand" {...props}>
+    <Icon type="stock" /> loanExchange
   </div>
 );
 

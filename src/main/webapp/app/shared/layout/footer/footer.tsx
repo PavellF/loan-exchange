@@ -1,7 +1,7 @@
 import React from 'react';
-import { Storage } from 'react-jhipster';
-import { LocaleMenu } from 'app/shared/layout/menus';
 import { Button } from 'antd';
+import { Storage } from 'app/shared/util/storage-util';
+import { LocaleMenu } from 'app/shared/layout/menus/locale';
 
 const Footer = ({ currentLocale, onLocaleChange, oneline = false, style = { margin: '0.5rem 0' } }) => {
   const handleLocaleChange = value => {

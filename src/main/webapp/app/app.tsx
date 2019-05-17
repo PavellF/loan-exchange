@@ -1,4 +1,3 @@
-import 'react-toastify/dist/ReactToastify.css';
 import './app.scss';
 import 'antd/dist/antd.css';
 
@@ -17,10 +16,10 @@ import ErrorBoundary from 'app/shared/error/error-boundary';
 import { AUTHORITIES } from 'app/config/constants';
 import AppRoutes from 'app/routes';
 import AuthFlow from 'app/modules/account/auth-flow/auth-flow';
-import ErrorBoundaryRoute from 'app/shared/error/error-boundary-route';
 import { AppHeader } from 'app/shared/layout/header/header';
 import { Layout, Menu } from 'antd';
 import Spin from 'antd/lib/spin';
+import ErrorBoundaryRoute from 'app/shared/error/error-boundary-route';
 
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;

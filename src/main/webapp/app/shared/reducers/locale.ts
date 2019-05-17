@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-import { TranslatorContext, Storage } from 'react-jhipster';
+import { TranslatorContext } from '../language';
 
 export const ACTION_TYPES = {
   SET_LOCALE: 'locale/SET_LOCALE'

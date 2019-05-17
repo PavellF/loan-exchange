@@ -1,7 +1,6 @@
 import React, { useEffect, useReducer, useState } from 'react';
 import { Card } from 'antd';
 import { BrandIcon } from 'app/shared/layout/header/header-components';
-import { getUrlParameter, translate, Translate } from 'react-jhipster';
 import Form from 'antd/lib/form';
 import Input from 'antd/lib/input';
 import Icon from 'antd/lib/icon';
@@ -15,8 +14,11 @@ import { IRootState } from 'app/shared/reducers';
 import { handleRegister, reset } from 'app/modules/account/register/register.reducer';
 import { connect } from 'react-redux';
 import { IUser } from 'app/shared/model/user.model';
-import { handlePasswordResetFinish, handlePasswordResetInit } from 'app/modules/account/password-reset/password-reset.reducer';
+import { handlePasswordResetFinish, handlePasswordResetInit } from 'app/modules/account/password/password-reset.reducer';
 import { login } from 'app/shared/reducers/authentication';
+import { getUrlParameter } from 'app/shared/util/url-utils';
+import { translate } from 'app/shared/language';
+import Translate from 'app/shared/language/translate';
 
 const ENTER_EMAIL = 'ENTER_EMAIL';
 const SELECT_ROLE = 'SELECT_ROLE';

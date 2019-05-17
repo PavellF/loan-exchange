@@ -1,8 +1,6 @@
 import React from 'react';
 import { Route } from 'react-router-dom';
-import { shallow, mount } from 'enzyme';
-
-import ErrorBoundaryRoute from 'app/shared/error/error-boundary-route';
+import { mount, shallow } from 'enzyme';
 
 const ErrorComp = () => {
   throw new Error('test');

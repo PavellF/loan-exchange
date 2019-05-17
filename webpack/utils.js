@@ -4,23 +4,20 @@ const path = require('path');
 module.exports = {
   parseVersion,
   root,
-  isExternalLib
 };
 
-const parseString = require('xml2js').parseString;
-// return the version number from `pom.xml` file
+// return the version number from `package.json` file
 function parseVersion() {
   let version = null;
-  const pomXml = fs.readFileSync('pom.xml', 'utf8');
-  parseString(pomXml, (err, result) => {
-    if (result.project.version && result.project.version[0]) {
-      version = result.project.version[0];
-    } else if (result.project.parent && result.project.parent[0] && result.project.parent[0].version && result.project.parent[0].version[0]) {
-      version = result.project.parent[0].version[0];
-    }
-  });
+  const packageJson = fs.readFileSync('package.json', 'utf8');
+  const packageJSON = JSON.parse(packageJson);
+
+  if (packageJSON.version) {
+    version = packageJSON.version;
+  }
+
   if (version === null) {
-    throw new Error('pom.xml is malformed. No version is defined');
+    throw new Error('package.json is malformed. No version is defined');
   }
   return version;
 }

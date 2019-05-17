@@ -1,8 +1,8 @@
 import axios from 'axios';
-import { translate } from 'react-jhipster';
 
 import { FAILURE, REQUEST, SUCCESS } from 'app/shared/reducers/action-type.util';
 import { IUser } from 'app/shared/model/user.model';
+import { translate } from 'app/shared/language';
 
 export const ACTION_TYPES = {
   CREATE_ACCOUNT: 'register/CREATE_ACCOUNT',
