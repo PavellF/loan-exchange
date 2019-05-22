@@ -1,9 +1,9 @@
 import React from 'react';
-import { Route } from 'react-router-dom';
-import { shallow } from 'enzyme';
-import { TranslatorContext } from 'react-jhipster';
+import {Route} from 'react-router-dom';
+import {shallow} from 'enzyme';
+import {TranslatorContext} from 'react-jhipster';
 
-import { PrivateRouteComponent, hasAnyAuthority } from 'app/shared/auth/private-route';
+import {hasAnyAuthority, PrivateRouteComponent} from 'app/shared/auth/private-route';
 
 const TestComp = () => <div>Test</div>;
 
