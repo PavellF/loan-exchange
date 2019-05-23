@@ -24,8 +24,8 @@ export const defaultValue: Readonly<IUser> = {
   langKey: '',
   authorities: [],
   createdBy: '',
-  createdDate: null,
+  createdDate: undefined,
   lastModifiedBy: '',
-  lastModifiedDate: null,
+  lastModifiedDate: undefined,
   password: ''
 };

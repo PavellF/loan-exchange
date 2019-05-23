@@ -20,3 +20,4 @@ export const APP_WHOLE_NUMBER_FORMAT = '0,0';
 export const APP_TWO_DIGITS_AFTER_POINT_NUMBER_FORMAT = '0,0.[00]';
 export const CREDIT_FEE_PERCENT = 0.02;
 export const CREDIT_MIN_FEE = 10;
+export const ITEMS_PER_PAGE = 20;

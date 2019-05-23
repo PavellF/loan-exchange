@@ -1,4 +1,4 @@
-export const enum StorageType {
+export enum StorageType {
   SESSION,
   LOCAL
 }
@@ -64,7 +64,7 @@ export interface IStorageService {
   local: IStorageAPI;
 }
 
-export const Storage: IStorageService = {
+export const StorageUtils: IStorageService = {
   session: {
     get: getItem(StorageType.SESSION),
     set: setItem(StorageType.SESSION),

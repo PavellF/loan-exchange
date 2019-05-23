@@ -1,6 +1,6 @@
 import {message} from 'antd';
 import {isPromise} from "../shared/util/promise-utils";
-
+/*
 const addErrorAlert = (messageStr, key?, data?) => {
   key = key ? key : messageStr;
   message.error(translate(key, data));
@@ -11,11 +11,11 @@ export default () => next => action => {
     return next(action);
   }
 
-  /**
+  /!**
    *
    * The notification middleware serves to dispatch the initial pending promise to
    * the promise middleware, but adds a `then` and `catch.
-   */
+   *!/
   return next(action)
     .then(response => {
       if (action.meta && action.meta.successMessage) {
@@ -103,4 +103,4 @@ export default () => next => action => {
       }
       return Promise.reject(error);
     });
-};
+};*/

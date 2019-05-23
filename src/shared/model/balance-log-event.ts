@@ -1,4 +1,4 @@
-export const enum BalanceLogEvent {
+export enum BalanceLogEvent {
   NEW_DEAL_OPEN = 'NEW_DEAL_OPEN',
   LOAN_TAKEN = 'LOAN_TAKEN',
   PERCENT_CHARGE = 'PERCENT_CHARGE',

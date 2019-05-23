@@ -1,21 +1,22 @@
 import axios from 'axios';
 import {SERVER_API_URL} from './constants';
-import {Storage} from '../shared/util/storage-util';
+import {StorageUtils} from "../shared/util/storage-util";
 
 const TIMEOUT = 1 * 60 * 1000;
 axios.defaults.timeout = TIMEOUT;
 axios.defaults.baseURL = SERVER_API_URL;
 
-const setupAxiosInterceptors = onUnauthenticated => {
-  const onRequestSuccess = config => {
-    const token = Storage.local.get('jhi-authenticationToken') || Storage.session.get('jhi-authenticationToken');
+const setupAxiosInterceptors = (onUnauthenticated: any) => {
+  const onRequestSuccess = (config: any) => {
+    const token = StorageUtils.local.get('authenticationToken') ||
+      StorageUtils.session.get('authenticationToken');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   };
   const onResponseSuccess = response => response;
-  const onResponseError = err => {
+  const onResponseError = (err: any) => {
     const status = err.status || err.response.status;
     if (status === 403 || status === 401) {
       onUnauthenticated();

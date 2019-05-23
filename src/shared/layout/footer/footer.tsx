@@ -1,19 +1,13 @@
 import React from 'react';
 import {Button} from 'antd';
-import {Storage} from 'app/shared/util/storage-util';
-import {LocaleMenu} from 'app/shared/layout/menus/locale';
+import LocaleMenu from "../menus/locale";
 
-const Footer = ({ currentLocale, onLocaleChange, oneline = false, style = { margin: '0.5rem 0' } }) => {
-  const handleLocaleChange = value => {
-    const langKey = value;
-    Storage.session.set('locale', langKey);
-    onLocaleChange(langKey);
-  };
+const Footer = ({ oneline = false, style = { margin: '0.5rem 0' } }) => {
 
   if (oneline) {
     return (
       <footer className="footer_oneline" style={style}>
-        <LocaleMenu maxInline={3} currentLocale={currentLocale} onChange={handleLocaleChange} />
+        <LocaleMenu maxInline={3} />
       </footer>
     );
   } else {
@@ -32,7 +26,7 @@ const Footer = ({ currentLocale, onLocaleChange, oneline = false, style = { marg
           <Button icon="github" shape="circle" />
         </div>
         <div>
-          <LocaleMenu maxInline={3} currentLocale={currentLocale} onChange={handleLocaleChange} />
+          <LocaleMenu maxInline={3} />
         </div>
       </footer>
     );

@@ -1,7 +1,6 @@
-import './password-strength-bar.scss';
+import './password-strength-bar.css';
 
 import React from 'react';
-import {Translate} from 'app/shared/language';
 
 export interface IPasswordStrengthBarProps {
   password: string;
@@ -53,7 +52,7 @@ export const PasswordStrengthBar = ({ password }: IPasswordStrengthBarProps) => 
   };
 
   const getPoints = force => {
-    const pts = [];
+    const pts: JSX.Element[] = [];
     for (let i = 0; i < 5; i++) {
       pts.push(<li key={i} className="point" style={i < force.idx ? { backgroundColor: force.col } : { backgroundColor: '#DDD' }} />);
     }
@@ -66,7 +65,7 @@ export const PasswordStrengthBar = ({ password }: IPasswordStrengthBarProps) => 
   return (
     <div id="strength">
       <small>
-        <Translate contentKey="global.messages.validate.newpassword.strength">Password strength:</Translate>
+        Password strength:
       </small>
       <ul style={{ paddingLeft: 0 }} id="strengthBar">
         {points}
