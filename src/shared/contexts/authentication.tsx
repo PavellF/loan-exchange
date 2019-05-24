@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import axios from "axios";
 import {StorageUtils} from "../util/storage-util";
 import {IUser} from "../model/user.model";
+import {AUTH_TOKEN_KEY} from "../../config/constants";
 
 const initialState = {
   loading: false,
@@ -21,7 +22,7 @@ const initialState = {
 };
 
 export const Authentication = React.createContext(initialState);
-const AUTH_TOKEN_KEY = 'jhi-authenticationToken';
+
 
 const AuthenticationContext = (props) => {
 
@@ -48,14 +49,14 @@ const AuthenticationContext = (props) => {
         }
       }
 
+      getSession();
+
     }).catch(error => {
       setAuth(Object.assign({}, auth, {
         errorMessage: error,
         loginError: true
       }));
     });
-
-    getSession();
   };
 
   const getSession = () => {
@@ -91,6 +92,7 @@ const AuthenticationContext = (props) => {
 
   const logout = () => {
     clearAuthToken();
+    setAuth(initialState);
   };
 
   const clearAuthentication = () => {

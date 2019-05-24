@@ -2,15 +2,19 @@ import './app.css';
 import 'antd/dist/antd.css';
 
 import React, {useContext, useEffect} from 'react';
-import {BrowserRouter as Router, Redirect, Switch} from 'react-router-dom';
+import {BrowserRouter as Router, Redirect, Route, Switch} from 'react-router-dom';
 import {hot} from 'react-hot-loader';
 import Spin from 'antd/lib/spin';
 import {Authentication} from "./shared/contexts/authentication";
 import Footer from "./shared/layout/footer/footer";
-import {Route, RouteProps} from 'react-router-dom';
 import AuthFlow from "./modules/account/auth-flow/auth-flow"
 import setupAxiosInterceptors from "./config/axios-interceptor";
 import {Translation} from "./shared/contexts/translation";
+import RegisterContext from "./shared/contexts/register";
+import PasswordResetContext from "./shared/contexts/password-reset";
+import {Layout} from "antd";
+import {AppHeader} from "./shared/layout/header/header";
+import Routes from "./routes";
 
 // @ts-ignore
 const baseHref = document.querySelector('base').getAttribute('href')
@@ -37,36 +41,40 @@ export const App = (props: any) => {
     );
   }
 
-  if (auth.isAuthenticated || false) {
+  if (auth.isAuthenticated) {
 
     if (auth.account && auth.account.langKey) {
       translation.setLanguage(auth.account.langKey);
     }
 
-    /*pageBody = (
+    pageBody = (
       <Layout>
         <AppHeader/>
 
-        <Layout className="container">
+        <Layout className="Container">
           <Layout style={{padding: '18px 0px', minHeight: 'calc(100vh - 64px - 108px)'}}>
             <Routes/>
           </Layout>
         </Layout>
 
-        <Layout className="container">
+        <Layout className="Container">
           <Footer/>
         </Layout>
       </Layout>
-    );*/
+    );
   } else {
     pageBody = (
-      <div className="login-flow-container">
-        <Switch>
-            <Route path="/auth" component={AuthFlow}/>
-            <Redirect to="/auth"/>
-          </Switch>
-          <Footer oneline/>
-      </div>
+      <RegisterContext>
+        <PasswordResetContext>
+          <div className="login-flow-container">
+            <Switch>
+              <Route path="/auth" component={AuthFlow}/>
+              <Redirect to="/auth"/>
+            </Switch>
+            <Footer oneline/>
+          </div>
+        </PasswordResetContext>
+      </RegisterContext>
     );
   }
 

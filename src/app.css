@@ -3,11 +3,11 @@
   align-items: center;
 }
 
-.active {
+.Fade-In {
   animation: fadeIn ease 1s;
 }
 
-.hidden {
+.Hidden {
   display: none;
 }
 
@@ -20,21 +20,28 @@
   }
 }
 
-.email-card__head {
+.Column {
   display: flex;
   flex-flow: column;
+}
+
+.Centered {
   align-items: center;
 }
 
-.email-card__row {
+.Row {
   display: flex;
-  justify-content: space-between;
   align-items: center;
 }
 
-.card__row_end {
+.Between {
+  justify-content: space-between;
+}
+
+.End {
   justify-content: flex-end;
 }
+
 
 .register-card__head {
   display: flex;
@@ -224,7 +231,7 @@ a.anchor-btn:hover {
 Layout styles
 ========================================================================== */
 
-.container {
+.Container {
   width: 1024px;
   margin: auto;
 }
@@ -368,7 +375,7 @@ Account page styles
   padding: 1.5rem 0;
 }
 
-.brand {
+.Brand {
   font-size: 1.5rem;
   font-family: initial;
   color: #030852;
@@ -380,7 +387,7 @@ Account page styles
   z-index: 1031;
 }
 
-.header {
+.Header {
   display: flex;
   justify-content: space-between;
 }

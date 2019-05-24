@@ -1,5 +1,5 @@
-
 export const SERVER_API_URL = 'https://loan-exchange-backend.herokuapp.com/';
+export const AUTH_TOKEN_KEY = 'authenticationToken';
 
 export const AUTHORITIES = {
   ADMIN: 'ROLE_ADMIN',

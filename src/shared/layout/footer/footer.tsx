@@ -1,8 +1,18 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {Button} from 'antd';
 import LocaleMenu from "../menus/locale";
+import {Translation} from "../../contexts/translation";
+import {Authentication} from "../../contexts/authentication";
 
 const Footer = ({ oneline = false, style = { margin: '0.5rem 0' } }) => {
+
+  const translation = useContext(Translation);
+  const auth = useContext(Authentication);
+
+  const doLogout = () => {
+    auth.logout();
+    auth.getSession();
+  };
 
   if (oneline) {
     return (
@@ -17,8 +27,8 @@ const Footer = ({ oneline = false, style = { margin: '0.5rem 0' } }) => {
           <span>LoanExchange © {new Date().getFullYear()}</span>
         </div>
         <div>
-          <a style={{ marginRight: '12px' }}>Go Up</a>
-          <a>Logout</a>
+          <a href="#" style={{ marginRight: '12px' }}>{translation.translation.Footer.goUp}</a>
+          <a onClick={doLogout}>{translation.translation.Footer.logout}</a>
         </div>
         <div>
           <Button style={{ marginRight: '6px' }} icon="github" shape="circle" />

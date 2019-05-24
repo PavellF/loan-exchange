@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useReducer, useState} from 'react';
-import {Card} from 'antd';
+import {Card, message} from 'antd';
 import Form from 'antd/lib/form';
 import Input from 'antd/lib/input';
 import Icon from 'antd/lib/icon';
@@ -9,11 +9,13 @@ import Col from 'antd/lib/grid/col';
 import Checkbox from 'antd/lib/checkbox';
 import {getUrlParameter} from "../../../shared/util/url-utils";
 import {AUTHORITIES} from "../../../config/constants";
-import {IUser} from "../../../shared/model/user.model";
+import {IUserVM} from "../../../shared/model/user.model";
 import {BrandIcon} from "../../../shared/layout/header/header-components";
 import PasswordStrengthBar from "../../../shared/layout/password/password-strength-bar";
 import {Authentication} from "../../../shared/contexts/authentication";
 import {Translation} from "../../../shared/contexts/translation";
+import {Register} from "../../../shared/contexts/register";
+import {PasswordReset} from "../../../shared/contexts/password-reset";
 
 const ENTER_EMAIL = 'ENTER_EMAIL';
 const SELECT_ROLE = 'SELECT_ROLE';
@@ -26,75 +28,87 @@ const RESET_PASSWORD = 'RESET_PASSWORD';
 const GO_BACK = 'GO_BACK';
 const GO_FORWARD = 'GO_FORWARD';
 
-const AuthFlow = (props: any) => {
-  const { getFieldDecorator, validateFields, getFieldValue } = props.form;
-  const { location } = props;
-  const auth = useContext(Authentication);
-  const translation = useContext(Translation);
-  const t = translation.translation.authFlow;
+const reducer = (currentState, action) => {
+  if (action.type === GO_BACK && currentState.length > 0) {
+    const copy = [...currentState];
+    copy.pop();
+    return copy;
+  } else if (action.type === GO_FORWARD) {
+    return currentState.concat(action.payload);
+  }
 
-  /*useEffect(() => {
-    if (props.registrationSuccess) {
-      props.login(getFieldValue('email'), getFieldValue('password'), true);
-    }
-  }, [props.registrationSuccess]);*/
+  return currentState;
+};
+
+const AuthFlow = (props: any) => {
+  const {getFieldDecorator, validateFields, getFieldValue} = props.form;
+  const {location} = props;
+  const auth = useContext(Authentication);
+  const register = useContext(Register);
+  const resetPassword = useContext(PasswordReset);
+  const translation = useContext(Translation);
+  const t = translation.translation.AuthFlow;
+  const stack: string[] = [];
+  const [flowStack, dispatch] = useReducer(reducer, stack);
+  const [showPassword, setShowPassword] = useState(true);
+  const [confirmDirty, setConfirmDirty] = useState(false);
+  const startCard = getUrlParameter('card', props.location.search);
+  const resetKey = getUrlParameter('key', props.location.search);
 
   useEffect(() => {
-    const { from } = location.state || { from: { pathname: '/', search: location.search } };
+    const {from} = location.state || {from: {pathname: '/', search: location.search}};
 
     if (auth.isAuthenticated) {
       props.history.push(from);
     }
 
     return () => {
-      //props.reset();
+      register.reset();
+      resetPassword.reset();
     };
   }, []);
 
-  /*useEffect(() => {
-    if (props.resetPasswordSuccess) {
-      if (resetKey) {
-        dispatch({ type: GO_FORWARD, payload: ENTER_EMAIL });
-      } else {
-        dispatch({ type: GO_FORWARD, payload: RESET_PASSWORD });
-      }
+  useEffect(() => {
+    if (register.registrationSuccess) {
+      message.success(t.registrationSuccess);
+      auth.login(getFieldValue('email'), getFieldValue('password'), true);
     }
-  }, [props.resetPasswordSuccess]);*/
+  }, [register.registrationSuccess]);
 
-  const reducer = (currentState, action) => {
-    if (action.type === GO_BACK && currentState.length > 0) {
-      const copy = [...currentState];
-      copy.pop();
-      return copy;
-    } else if (action.type === GO_FORWARD) {
-      return currentState.concat(action.payload);
-    }
+  if (register.registrationFailure) {
+    message.error(t.registrationFailure);
+  }
 
-    return currentState;
-  };
-
-  const startCard = getUrlParameter('card', props.location.search);
-  const resetKey = getUrlParameter('key', props.location.search);
-  const stack: string[] = [];
-
-  if (resetKey) {
-    stack.push(RESET_PASSWORD);
-  } else {
-    stack.push(ENTER_EMAIL);
-    if (startCard) {
-      stack.push(startCard);
+  if (resetPassword.resetPasswordSuccess) {
+    message.success(t.resetPasswordSuccess);
+    if (resetKey) {
+      dispatch({type: GO_FORWARD, payload: ENTER_EMAIL});
+    } else {
+      dispatch({type: GO_FORWARD, payload: RESET_PASSWORD});
     }
   }
 
-  const [flowStack, dispatch] = useReducer(reducer, stack);
-  const [showPassword, setShowPassword] = useState(true);
-  const [confirmDirty, setConfirmDirty] = useState(false);
+  if (resetPassword.resetPasswordFailure) {
+    message.error(t.resetPasswordFailure);
+  }
+
+  if (auth.loginError) {
+    message.error(t.loginError);
+  }
+
+  if (resetKey) {
+    stack.push(RESET_PASSWORD);
+  } else if (startCard) {
+    stack.push(startCard);
+  } else {
+    stack.push(ENTER_EMAIL);
+  }
 
   const handleLogin = event => {
     event.preventDefault();
     validateFields((err, values) => {
       if (!err) {
-        //props.login(values.email, values.password, values.rememberMe);
+        auth.login(values.email, values.password, values.rememberMe);
       }
     });
   };
@@ -104,22 +118,21 @@ const AuthFlow = (props: any) => {
     validateFields((err, values) => {
       if (!err) {
         const ref = getUrlParameter('ref', props.location.search);
-        let role = AUTHORITIES.CREDITOR;
+        const newUser: IUserVM = {};
 
-        if (flowStack[flowStack.length - 1] === CREATE_DEBTOR_ACCOUNT) {
-          role = AUTHORITIES.DEBTOR;
-        }
-
-        const newUser: IUser = {};
         newUser.login = values.email;
         newUser.firstName = values.firstName;
         newUser.lastName = values.lastName;
         newUser.email = values.email;
-        //newUser.langKey = props.currentLocale;
-        newUser.authorities = [role];
+        newUser.langKey = translation.currentLanguage;
         newUser.password = values.password;
+        newUser.role = AUTHORITIES.CREDITOR;
 
-        //props.handleRegister(newUser, ref);
+        if (flowStack[flowStack.length - 1] === CREATE_DEBTOR_ACCOUNT) {
+          newUser.role = AUTHORITIES.DEBTOR;
+        }
+
+        register.createAccount(newUser, ref);
       }
     });
   };
@@ -127,7 +140,7 @@ const AuthFlow = (props: any) => {
   const handlePasswordResetStart = event => {
     validateFields(['email'], (err, values) => {
       if (!err) {
-        //props.handlePasswordResetInit(getFieldValue('email'));
+        resetPassword.resetPasswordInit(getFieldValue('email'));
       }
     });
   };
@@ -136,7 +149,7 @@ const AuthFlow = (props: any) => {
     event.preventDefault();
     validateFields((err, values) => {
       if (!err) {
-        //props.handlePasswordResetFinish(resetKey, values.password);
+        resetPassword.resetPasswordFinish(resetKey, values.password);
       }
     });
   };
@@ -144,7 +157,7 @@ const AuthFlow = (props: any) => {
   const validateToNextPassword = (rule, value, callback) => {
     const form = props.form;
     if (value && confirmDirty) {
-      form.validateFields(['confirm'], { force: true });
+      form.validateFields(['confirm'], {force: true});
     }
     callback();
   };
@@ -152,16 +165,17 @@ const AuthFlow = (props: any) => {
   const compareToFirstPassword = (rule, value, callback) => {
     const form = props.form;
     if (value && value !== form.getFieldValue('password')) {
-      callback('register.messages.validate.password.equality');
+      callback(t.passwordEquality);
     } else {
       callback();
     }
   };
 
-  const getCaptcha = () => {};
+  const getCaptcha = () => {
+  };
 
   const validateAndGoForward = (fieldsToValidate: string[], to: string) => {
-    validateFields(fieldsToValidate).then(_ => dispatch({ type: GO_FORWARD, payload: to }));
+    validateFields(fieldsToValidate).then(_ => dispatch({type: GO_FORWARD, payload: to}));
   };
 
   const handleConfirmBlur = e => {
@@ -171,80 +185,69 @@ const AuthFlow = (props: any) => {
 
   if (flowStack[flowStack.length - 1] === ENTER_EMAIL || flowStack[flowStack.length - 1] === ENTER_PASSWORD) {
     return (
-      <Card style={{ width: 400 }}>
+      <Card style={{width: 400}}>
         <Form onSubmit={handleLogin}>
-          <div className={flowStack[flowStack.length - 1] === ENTER_EMAIL ? 'active' : 'hidden'}>
-            <div className="email-card__head">
-              <BrandIcon />
-              <h1>
-                {t.signIn}
-              </h1>
-              <p>
-                Using loanExchange account
-              </p>
+          <div className={flowStack[flowStack.length - 1] === ENTER_EMAIL ? 'Fade-In' : 'Hidden'}>
+
+            <div className="Column Centered">
+              <BrandIcon/>
+              <h1>{t.signIn}</h1>
+              <p>{t.usingAccount}</p>
             </div>
 
-            <div className="email-card__main">
-              <Form.Item>
-                {getFieldDecorator('email', {
-                  rules: [
-                    { required: true, message: 'register.messages.validate.email.required' },
-                    { type: 'email', message: 'register.messages.validate.email.pattern' }
-                  ]
-                })(<Input size="large" type={'email'} placeholder="E-mail" />)}
-              </Form.Item>
-              <p>
-                Or login with:
-              </p>
-              <div className="brands">
-                <Button shape="circle" icon="facebook" />
-                <Button shape="circle" icon="instagram" />
-                <Button shape="circle" icon="google" />
-              </div>
+            <Form.Item>
+              {getFieldDecorator('email', {
+                rules: [
+                  {required: true, message: t.emailRequired},
+                  {type: 'email', message: t.emailPattern}
+                ]
+              })(<Input size="large" type={'email'} placeholder="E-mail"/>)}
+            </Form.Item>
+            <p>{t.orLoginWith + ':'}</p>
+            <div className="brands">
+              <Button shape="circle" icon="facebook"/>
+              <Button shape="circle" icon="instagram"/>
+              <Button shape="circle" icon="google"/>
             </div>
 
-            <div className="email-card__row">
-              <a onClick={() => dispatch({ type: GO_FORWARD, payload: SELECT_ROLE })}>
-                Create Account
+            <div className="Row Between">
+              <a onClick={() => dispatch({type: GO_FORWARD, payload: SELECT_ROLE})}>
+                {t.createAccount}
               </a>
               <Button type="primary" onClick={() => validateAndGoForward(['email'], ENTER_PASSWORD)}>
-                Next
+                {t.next}
               </Button>
             </div>
           </div>
 
-          <div className={flowStack[flowStack.length - 1] === ENTER_PASSWORD ? 'active' : 'hidden'}>
-            <a onClick={() => dispatch({ type: GO_BACK })}>
-              <Icon type="arrow-left" />
+          <div className={flowStack[flowStack.length - 1] === ENTER_PASSWORD ? 'Fade-In' : 'Hidden'}>
+            <a onClick={() => dispatch({type: GO_BACK})}>
+              <Icon type="arrow-left"/>
             </a>
 
-            <div className="email-card__head">
-              <BrandIcon />
-              <h1>
-                Welcome
-              </h1>
-              <p>
-                <Icon type="user" /> {getFieldValue('email')}
-              </p>
+            <div className="Column Centered">
+              <BrandIcon/>
+              <h1>{t.welcome}</h1>
+              <p><Icon type="user"/> {getFieldValue('email')}</p>
             </div>
 
             <Form.Item>
               {getFieldDecorator('password', {
                 rules: [
-                  { required: true, message: 'register.messages.validate.password.required' },
-                  { validator: null },
-                  { min: 6, message: 'register.messages.validate.password.minlength' },
-                  { max: 64, message: 'register.messages.validate.password.maxlength' }
+                  {required: true, message: t.passwordRequired},
+                  {validator: null},
+                  {min: 6, message: t.passwordMin(6)},
+                  {max: 64, message: t.passwordMax(64)}
                 ]
-              })(<Input.Password size="large" placeholder={'register.form.password'} />)}
+              })(<Input.Password size="large" placeholder={t.passwordPlaceholder}/>)}
             </Form.Item>
 
-            <div className="email-card__row">
+            <div className="Row Between">
               <a onClick={handlePasswordResetStart}>
                 Forgot password?
               </a>
-              <Button loading={/*props.loginLoading*/false} type="primary" htmlType="submit">
-                Next
+              <Button loading={auth.loading} type="primary" htmlType="submit">
+                {t.signIn}
               </Button>
             </div>
           </div>
@@ -258,116 +261,105 @@ const AuthFlow = (props: any) => {
     flowStack[flowStack.length - 1] === LEGAL
   ) {
     return (
-      <Card style={{ maxWidth: 450 }}>
+      <Card style={{maxWidth: 450}}>
         <Form onSubmit={handleSignUp}>
-          <div className={flowStack[flowStack.length - 1] === SELECT_ROLE ? 'active' : 'hidden'}>
-            <a onClick={() => dispatch({ type: GO_BACK })}>
-              <Icon type="arrow-left" />
+          <div className={flowStack[flowStack.length - 1] === SELECT_ROLE ? 'Fade-In' : 'Hidden'}>
+            <a onClick={() => dispatch({type: GO_BACK})}>
+              <Icon type="arrow-left"/>
             </a>
 
-            <div className="email-card__head">
-              <BrandIcon />
-              <h1>
-                Select account type
-              </h1>
+            <div className="Column Centered">
+              <BrandIcon/>
+              <h1>{t.selectRole}</h1>
             </div>
 
-            <Button size="large" block onClick={() => validateAndGoForward([], CREATE_DEBTOR_ACCOUNT)}>
-              selectCreditor
-              <Icon type="right" />
-            </Button>
-            <p>
-              creditorDescription
-            </p>
             <Button size="large" block onClick={() => validateAndGoForward([], CREATE_CREDITOR_ACCOUNT)}>
-              selectDebtor
-              <Icon type="right" />
+              {t.creditor}
+              <Icon type="right"/>
             </Button>
-            <p>
-              debtorDescription
-            </p>
+            <p>{t.creditorDesc}</p>
+            <Button size="large" block onClick={() => validateAndGoForward([], CREATE_DEBTOR_ACCOUNT)}>
+              {t.debtor}
+              <Icon type="right"/>
+            </Button>
+            <p>{t.debtorDesc}</p>
           </div>
 
-          <div
-            className={
-              flowStack[flowStack.length - 1] === CREATE_DEBTOR_ACCOUNT || flowStack[flowStack.length - 1] === CREATE_CREDITOR_ACCOUNT
-                ? 'active'
-                : 'hidden'
-            }
-          >
-            <a onClick={() => dispatch({ type: GO_BACK })}>
-              <Icon type="arrow-left" />
+          <div className={
+            flowStack[flowStack.length - 1] === CREATE_DEBTOR_ACCOUNT
+            || flowStack[flowStack.length - 1] === CREATE_CREDITOR_ACCOUNT ? 'Fade-In' : 'Hidden'
+          }>
+            <a onClick={() => dispatch({type: GO_BACK})}>
+              <Icon type="arrow-left"/>
             </a>
 
-            <div className="register-card__head">
-              <BrandIcon />
-              <h1>
-                Create loanExchange account
-              </h1>
+            <div className="Column">
+              <BrandIcon/>
+              <h1>{t.createAccountLabel}</h1>
             </div>
 
             <Row gutter={8}>
               <Col span={12}>
-                <Form.Item label={'register.form.firstName'}>
+                <Form.Item label={t.firstName}>
                   {getFieldDecorator('firstName', {
                     rules: [
-                      { required: true, message: 'register.messages.validate.firstName.required' },
-                      { min: 1, message: 'register.messages.validate.firstName.minlength' },
-                      { max: 64, message: 'register.messages.validate.firstName.maxlength' }
+                      {required: true, message: t.firstNameRequired},
+                      {min: 1, message: t.firstNameMin(1)},
+                      {max: 64, message: t.firstNameMax(64)}
                     ]
-                  })(<Input type={'text'} placeholder={'register.form.firstName'} />)}
+                  })(<Input type={'text'} placeholder={t.firstName}/>)}
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item label={'register.form.lastName'}>
+                <Form.Item label={t.lastName}>
                   {getFieldDecorator('lastName', {
                     rules: [
-                      { required: true, message: 'register.messages.validate.lastName.required' },
-                      { min: 1, message: 'register.messages.validate.lastName.minlength' },
-                      { max: 64, message: 'register.messages.validate.lastName.maxlength' }
+                      {required: true, message: t.lastNameRequired},
+                      {min: 1, message: t.lastNameMin(1)},
+                      {max: 64, message: t.lastNameMax(64)}
                     ]
-                  })(<Input type={'text'} placeholder={'register.form.lastName'} />)}
+                  })(<Input type={'text'} placeholder={t.lastName}/>)}
                 </Form.Item>
               </Col>
             </Row>
 
-            <Form.Item label={'register.form.email'}>
+            <Form.Item label={t.email}>
               {getFieldDecorator('email', {
                 rules: [
-                  { required: true, message: 'register.messages.validate.email.required' },
-                  { type: 'email', message: 'register.messages.validate.email.pattern' }
+                  {required: true, message: t.emailRequired},
+                  {type: 'email', message: t.emailPattern}
                 ]
-              })(<Input type={'email'} placeholder="E-mail" />)}
+              })(<Input type={'email'} placeholder="E-mail"/>)}
             </Form.Item>
 
             <Row gutter={16}>
               <Col span={12}>
-                <Form.Item label={'register.form.password'}>
+                <Form.Item label={t.passwordPlaceholder}>
                   {getFieldDecorator('password', {
                     rules: [
-                      { required: true, message: 'register.messages.validate.password.required' },
-                      { validator: validateToNextPassword },
-                      { min: 6, message: 'register.messages.validate.password.minlength' },
-                      { max: 64, message: 'register.messages.validate.password.maxlength' }
+                      {required: true, message: t.passwordRequired},
+                      {validator: validateToNextPassword},
+                      {min: 6, message: t.passwordMin(6)},
+                      {max: 64, message: t.passwordMax(64)}
                     ]
-                  })(<Input type={showPassword ? 'text' : 'password'} placeholder={'register.form.password'} />)}
+                  })(<Input type={showPassword ? 'text' : 'password'} placeholder={t.passwordPlaceholder}/>)}
                 </Form.Item>
               </Col>
 
               <Col span={12}>
-                <Form.Item label={'register.form.confirmPassword'}>
+                <Form.Item label={t.confirmPassword}>
                   {getFieldDecorator('confirm', {
                     rules: [
-                      { required: true, message: 'register.messages.validate.password.confirm' },
-                      { validator: compareToFirstPassword },
-                      { min: 6, message: 'register.messages.validate.password.minlength' },
-                      { max: 64, message: 'register.messages.validate.password.maxlength' }
+                      {required: true, message: t.passwordRequired},
+                      {validator: compareToFirstPassword},
+                      {min: 6, message: t.passwordMin(6)},
+                      {max: 64, message: t.passwordMax(64)}
                     ]
                   })(
                     <Input
                       type={showPassword ? 'text' : 'password'}
                       onBlur={handleConfirmBlur}
-                      placeholder={'register.form.confirmPassword'}
+                      placeholder={t.confirmPassword}
                     />
                   )}
                 </Form.Item>
@@ -376,70 +368,65 @@ const AuthFlow = (props: any) => {
 
             <Row gutter={8}>
               <Col span={12}>
-                <PasswordStrengthBar password={getFieldValue('password') || ''} />
+                <PasswordStrengthBar password={getFieldValue('password') || ''}/>
               </Col>
 
               <Col span={4}>
-                <Button onClick={() => setShowPassword(s => !s)} shape="circle" icon={showPassword ? 'eye' : 'eye-invisible'} />
+                <Button onClick={() => setShowPassword(s => !s)} shape="circle"
+                        icon={showPassword ? 'eye' : 'eye-invisible'}/>
               </Col>
             </Row>
 
-            <p>
-              passwordStrengthMessage
-            </p>
+            <p>{t.passwordStrengthMessage}</p>
 
-            <Form.Item label={'register.captcha'} extra={'register.captchaExtra'}>
+            <Form.Item label={t.captcha} extra={t.captchaExtra}>
               <Row gutter={8}>
                 <Col span={12}>
                   {getFieldDecorator('captcha', {
-                    rules: [{ required: true, message: 'register.messages.validate.captcha.required' }]
-                  })(<Input />)}
+                    rules: [{required: true, message: t.captchaRequired}]
+                  })(<Input/>)}
                 </Col>
                 <Col span={12}>
                   <Button onClick={getCaptcha}>
-                    etCaptcha
+                    {t.getCaptcha}
                   </Button>
                 </Col>
               </Row>
             </Form.Item>
 
             <Form.Item>
-              {getFieldDecorator('agreement', { valuePropName: 'checked' })(
+              {getFieldDecorator('agreement', {valuePropName: 'checked'})(
                 <Checkbox>
-                  I have read the
-                  <a onClick={() => dispatch({ type: GO_FORWARD, payload: LEGAL })}>
-                    agreement
+                  {t.iHaveRead}
+                  <a onClick={() => dispatch({type: GO_FORWARD, payload: LEGAL})}>
+                    {t.agreement}
                   </a>
                 </Checkbox>
               )}
             </Form.Item>
 
-            <div className="email-card__row">
-              <a onClick={() => dispatch({ type: GO_FORWARD, payload: ENTER_EMAIL })}>
-                Sign in instead
+            <div className="Row Between">
+              <a onClick={() => dispatch({type: GO_FORWARD, payload: ENTER_EMAIL})}>
+                {t.signInInstead}
               </a>
-              <Button type="primary" htmlType="submit" loading={/*props.registrationLoading*/false}
+              <Button type="primary" htmlType="submit" loading={register.loading}
                       disabled={!Boolean(getFieldValue('agreement'))}>
-                Next
+                {t.register}
               </Button>
             </div>
           </div>
 
-          <div className={flowStack[flowStack.length - 1] === LEGAL ? 'active' : 'hidden'}>
-            <a onClick={() => dispatch({ type: GO_BACK })}>
-              <Icon type="arrow-left" />
+          <div className={flowStack[flowStack.length - 1] === LEGAL ? 'Fade-In' : 'Hidden'}>
+            <a onClick={() => dispatch({type: GO_BACK})}>
+              <Icon type="arrow-left"/>
             </a>
 
             <div className="register-card__head">
-              <BrandIcon />
-              <h1>
-                Legal
-              </h1>
+              <BrandIcon/>
+              <h1>{t.legalLabel}</h1>
             </div>
 
-            <p style={{ overflowY: 'scroll', maxHeight: '600px' }}>
-              Legal
-            </p>
+            <p style={{overflowY: 'scroll', maxHeight: '600px'}}>{t.legal}</p>
           </div>
         </Form>
       </Card>
@@ -450,69 +437,67 @@ const AuthFlow = (props: any) => {
     if (resetKey) {
       payload = (
         <Form onSubmit={handlePasswordReset}>
-          <div className="email-card__head">
-            <BrandIcon />
+          <div className="Column Centered">
+            <BrandIcon/>
             <h1>
-              Reset password
+              {t.resetPassword}
             </h1>
           </div>
 
-          <Form.Item label={'register.form.password'}>
+          <Form.Item label={t.passwordPlaceholder}>
             {getFieldDecorator('password', {
               rules: [
-                { required: true, message: 'register.messages.validate.password.required' },
-                { validator: validateToNextPassword },
-                { min: 6, message: 'register.messages.validate.password.minlength' },
-                { max: 64, message: 'register.messages.validate.password.maxlength' }
+                {required: true, message: t.passwordRequired},
+                {validator: validateToNextPassword},
+                {min: 6, message: t.passwordMin(6)},
+                {max: 64, message: t.passwordMax(64)}
               ]
-            })(<Input.Password size="large" placeholder={'register.form.password'} />)}
+            })(<Input.Password size="large" placeholder={t.passwordPlaceholder}/>)}
           </Form.Item>
 
-          <Form.Item label={'register.form.confirmPassword'}>
+          <Form.Item label={t.confirmPassword}>
             {getFieldDecorator('confirm', {
               rules: [
-                { required: true, message: 'register.messages.validate.password.confirm' },
-                { validator: compareToFirstPassword },
-                { min: 6, message: 'register.messages.validate.password.minlength' },
-                { max: 64, message: 'register.messages.validate.password.maxlength' }
+                {required: true, message: t.confirmPassword},
+                {validator: compareToFirstPassword},
+                {min: 6, message: t.passwordMin(6)},
+                {max: 64, message: t.passwordMax(64)}
               ]
-            })(<Input.Password size="large" onBlur={handleConfirmBlur} placeholder={'register.form.confirmPassword'} />)}
+            })(<Input.Password size="large" onBlur={handleConfirmBlur} placeholder={t.confirmPassword}/>)}
           </Form.Item>
 
-          <div className="email-card__row card__row_end">
-            <Button loading={/*props.passwordResetLoading*/false} type="primary" htmlType="submit">
-              reset.request.form.button
+          <div className="Row End">
+            <Button loading={resetPassword.loading} type="primary" htmlType="submit">
+              {t.resetPassword}
             </Button>
           </div>
         </Form>
       );
     } else {
       payload = (
-        <div className="email-card__head">
-          <BrandIcon />
-          <h1>
-            reset.request.title
-          </h1>
+        <div className="Column Centered">
+          <BrandIcon/>
+          <h1>{t.resetRequest}</h1>
           <p>
-            <Icon type="user" /> {getFieldValue('email')}
+            <Icon type="user"/> {getFieldValue('email')}
           </p>
           <p>
-            reset.request.messages.success
+            {t.resetPasswordSuccess}
           </p>
         </div>
       );
     }
 
-    return <Card style={{ width: 400 }}>{payload}</Card>;
+    return <Card style={{width: 400}}>{payload}</Card>;
   } else {
     return (
       <Card>
-        <a onClick={() => dispatch({ type: GO_BACK })}>
-          <Icon type="arrow-left" />
+        <a onClick={() => dispatch({type: GO_BACK})}>
+          <Icon type="arrow-left"/>
         </a>
       </Card>
     );
   }
 };
 
-export default (Form.create({ name: 'auth_flow' })(AuthFlow));
+export default (Form.create({name: 'auth_flow'})(AuthFlow));
