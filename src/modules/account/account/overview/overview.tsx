@@ -34,18 +34,10 @@ const Overview = props => {
           }
         />
         <Statistic
-          valueStyle={{ fontSize: '2.2rem' }}
-          title="Поступлений за месяц (май)"
-          prefix="$"
-          value={568.08}
+          title="Expected revenue"
+          value={'112893¢'}
           suffix={
-            <Statistic
-              value={12.34}
-              precision={2}
-              valueStyle={{ color: 2 > 0 ? '#3f8600' : '#cf1322' }}
-              prefix={2 > 0 ? <Icon type="arrow-up" /> : <Icon type="arrow-down" />}
-              suffix="%"
-            />
+            <Statistic value={11.28} precision={2} valueStyle={{ color: '#3f8600' }} prefix={<Icon type="arrow-up" />} suffix="%" />
           }
         />
         <Statistic valueStyle={{ fontSize: '2.2rem' }} title="Поступлений за весь период" prefix="$" value={568.08} />

@@ -21,41 +21,41 @@ const NotificationContext = (props) => {
   const fetchNotifications = (page?: number, size?: number, sort?: string) => {
     const requestUrl = `api/notifications${sort ? `?page=${page}&size=${size}&sort=${sort}` : ''}`;
 
-    setState(Object.assign({}, state, {loading: true, errorMessage: null}));
+    setState(oldState => Object.assign({}, oldState, {loading: true, errorMessage: null}));
 
     axios.get<INotification[]>(requestUrl).then(payload => {
-      setState({
-        ...state,
+      setState(oldState => ({
+        ...oldState,
         loading: false,
         totalItems: payload.headers['x-total-count'],
         notifications: payload.data
-      });
+      }));
     }).catch(error => {
-      setState({
-        ...state,
+      setState(oldState => ({
+        ...oldState,
         loading: false,
         errorMessage: error
-      });
+      }));
     });
   };
 
   const fetchNotificationsCount = () => {
-    const requestUrl = `api/notifications?page=${1}&size=${1}`;
+    const requestUrl = `api/notifications?page=0&size=1`;
 
-    setState({...state, loading: true, errorMessage: null as unknown as string});
+    setState(oldState => ({...oldState, loading: true, errorMessage: null as unknown as string}));
 
     axios.get<INotification[]>(requestUrl).then(payload => {
-      setState({
-        ...state,
+      setState(oldState => ({
+        ...oldState,
         loading: false,
         totalItems: payload.headers['x-total-count'],
-      });
+      }));
     }).catch(error => {
-      setState({
-        ...state,
+      setState(oldState => ({
+        ...oldState,
         loading: false,
         errorMessage: error
-      });
+      }));
     });
   };
 
@@ -63,16 +63,16 @@ const NotificationContext = (props) => {
     setState({...state, loading: true, errorMessage: null as unknown as string});
 
     axios.delete(`api/notifications/${id}`).then(_ => {
-      setState({
-        ...state,
+      setState(oldState => ({
+        ...oldState,
         loading: false
-      });
+      }));
     }).catch(error => {
-      setState({
-        ...state,
+      setState(oldState => ({
+        ...oldState,
         loading: false,
         errorMessage: error
-      });
+      }));
     });
   };
 

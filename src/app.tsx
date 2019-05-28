@@ -8,13 +8,16 @@ import Spin from 'antd/lib/spin';
 import {Authentication} from "./shared/contexts/authentication";
 import Footer from "./shared/layout/footer/footer";
 import AuthFlow from "./modules/account/auth-flow/auth-flow"
-import setupAxiosInterceptors from "./config/axios-interceptor";
+import setupAxiosInterceptors, {setOnUnauthenticated} from "./config/axios-interceptor";
 import {Translation} from "./shared/contexts/translation";
 import RegisterContext from "./shared/contexts/register";
 import PasswordResetContext from "./shared/contexts/password-reset";
 import {Layout} from "antd";
 import {AppHeader} from "./shared/layout/header/header";
 import Routes from "./routes";
+import {UserBalance} from "./shared/contexts/user-balance";
+
+setupAxiosInterceptors();
 
 // @ts-ignore
 const baseHref = document.querySelector('base').getAttribute('href')
@@ -24,11 +27,16 @@ export const App = (props: any) => {
 
   const auth = useContext(Authentication);
   const translation = useContext(Translation);
-
-  setupAxiosInterceptors(() => auth.clearAuthentication());
+  const balance = useContext(UserBalance);
 
   useEffect(() => {
     auth.getSession();
+    balance.update();
+    setOnUnauthenticated(() => auth.clearAuthentication);
+    const balanceUpdateInterval = setInterval(balance.update, 60000); // 60 sec.
+    return () => {
+      clearInterval(balanceUpdateInterval);
+    };
   }, []);
 
   let pageBody;

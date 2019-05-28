@@ -1,5 +1,7 @@
 import React, {useState} from 'react';
 import Russian from "../i18n/Russian";
+import * as moment from "moment";
+import 'moment/locale/ru';
 
 export interface Language {
   name: string;
@@ -27,21 +29,23 @@ export const Translation = React.createContext(initialState);
 const TranslationContext = (props) => {
 
   const [state, setState] = useState(initialState);
+  moment.locale(initialState.currentLanguage);
 
   const setLanguage = (code: string) => {
 
     if (code !== state.currentLanguage) {
       const lang = languages.find(l => l.locale === code);
       if (lang) {
-        setState({...state, loading: true});
+        setState(oldState => ({...oldState, loading: true}));
         lang.load().then(module => {
-          setState({
-            ...state,
+          setState(oldState => ({
+            ...oldState,
             loading: false,
             currentLanguage: code,
             translation: module.default
-          });
-        }).catch(_ => setState({...state, loading: false}));
+          }));
+          moment.locale(lang.locale);
+        }).catch(_ => setState(oldState => ({...oldState, loading: false})));
       }
     }
   };

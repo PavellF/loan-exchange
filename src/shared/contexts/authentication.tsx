@@ -30,10 +30,10 @@ const AuthenticationContext = (props) => {
 
   const login = (username: string, password: string, rememberMe = false) => {
 
-    setAuth(Object.assign({}, auth, {loading: true}));
+    setAuth(oldState => Object.assign({}, oldState, {loading: true}));
 
     axios.post('api/authenticate', { username, password, rememberMe }).then(payload => {
-      setAuth(Object.assign({}, auth, {
+      setAuth(oldState => Object.assign({}, oldState, {
         loading: false,
         loginError: false,
         loginSuccess: true
@@ -52,7 +52,7 @@ const AuthenticationContext = (props) => {
       getSession();
 
     }).catch(error => {
-      setAuth(Object.assign({}, auth, {
+      setAuth(oldState => Object.assign({}, oldState, {
         errorMessage: error,
         loginError: true
       }));
@@ -61,18 +61,18 @@ const AuthenticationContext = (props) => {
 
   const getSession = () => {
 
-    setAuth(Object.assign({}, auth, {loading: true}));
+    setAuth(oldState => Object.assign({}, oldState, {loading: true}));
 
     axios.get('api/account').then(payload => {
       const isAuthenticated = payload && payload.data && payload.data.activated;
-      setAuth(Object.assign({}, auth, {
+      setAuth(oldState => Object.assign({}, oldState, {
         loading: false,
         isAuthenticated,
         sessionHasBeenFetched: true,
         account: payload.data
       }));
     }).catch(error => {
-      setAuth(Object.assign({}, auth, {
+      setAuth(oldState => Object.assign({}, oldState, {
         loading: false,
         isAuthenticated: false,
         sessionHasBeenFetched: true,
@@ -97,7 +97,7 @@ const AuthenticationContext = (props) => {
 
   const clearAuthentication = () => {
     clearAuthToken();
-    setAuth(Object.assign({}, auth, {
+    setAuth(oldState => Object.assign({}, oldState, {
       loading: false,
       isAuthenticated: false
     }));

@@ -22,3 +22,14 @@ export const cleanEntity = entity => {
  */
 export const mapIdList = (idList: ReadonlyArray<any>) =>
   idList.filter((entityId: any) => entityId !== '').map((entityId: any) => ({ id: entityId }));
+
+/**
+ * In order to parse use the following coinParser(value: string)
+ * */
+export const coinFormatter = (value: number | string | undefined): string => {
+  return `¢ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};
+
+export const coinParser = (value: string | undefined): number => {
+  return Number(value ? value.replace(/\¢\s?|(,*)/g, '') : 0);
+};

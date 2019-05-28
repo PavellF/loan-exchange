@@ -19,12 +19,12 @@ const RegisterContext = (props: any) => {
   const [state, setState] = useState(initialState);
 
   const createAccount = (user: IUserVM, referal?: string) => {
-    setState({...state, loading: true});
+    setState(state => ({...state, loading: true}));
 
     axios.post('api/register', user).then(payload => {
-      setState({...state, loading: false, registrationSuccess: true});
+      setState(state => ({...state, loading: false, registrationSuccess: true}));
     }).catch(error => {
-      setState({...state, loading: false, registrationFailure: true, errorMessage: error.response.data.errorKey});
+      setState(state => ({...state, loading: false, registrationFailure: true, errorMessage: error.response.data.errorKey}));
     });
   };
 

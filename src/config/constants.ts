@@ -21,3 +21,8 @@ export const APP_TWO_DIGITS_AFTER_POINT_NUMBER_FORMAT = '0,0.[00]';
 export const CREDIT_FEE_PERCENT = 0.02;
 export const CREDIT_MIN_FEE = 10;
 export const ITEMS_PER_PAGE = 20;
+export const MIN_CREDIT_AMOUNT = 500;
+
+export const DEALS_API = 'api/deals';
+
+export const ERROR_NO_MONEY = 'nomoney';

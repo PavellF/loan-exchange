@@ -1,45 +1,44 @@
-import React from 'react';
-import {Card, Statistic} from 'antd';
-import Button from 'antd/lib/button';
-import Icon from 'antd/lib/icon';
-import LoanStatistics from "./loan-statistics/loan-statistics";
+import React, {useContext, useEffect, useState} from 'react';
+import {message} from 'antd';
 import LoanListCard from "./loan-list-card/loan-list-card";
+import {Translation} from "../../shared/contexts/translation";
+import {UserBalance} from "../../shared/contexts/user-balance";
+import axios from "axios";
+import {DEALS_API} from "../../config/constants";
+import {IDeal} from "../../shared/model/deal.model";
 
-const LoanOverview = () => {
-  return (
-    <div>
-      <div className="loan-overview">
-        <Card style={{ marginRight: '2%', width: '49%' }} title="Active Deals Statistic" bordered={false}>
-          <div style={{ marginBottom: '24px' }}>
-            <Statistic
-              title="Expected revenue"
-              value={112893}
-              valueStyle={{ fontSize: '3rem' }}
-              suffix={
-                <Statistic value={11.28} precision={2} valueStyle={{ color: '#3f8600' }} prefix={<Icon type="arrow-up" />} suffix="%" />
-              }
-            />
-          </div>
-          <div className="loan-overview__bottom">
-            <div style={{ marginRight: '24px' }}>
-              <Statistic title="Allowed to spend balance" value={112893} suffix={'¢'} />
-              <Button style={{ marginTop: 16 }} type="primary">
-                Recharge
-              </Button>
-            </div>
-            <div>
-              <Statistic title="Your average credit percent per year" value={83.83} precision={2} suffix="%" />
-            </div>
-          </div>
-        </Card>
-        <Card title="Credit statistic" bordered={false} style={{ width: '49%' }}>
-          <LoanStatistics />
-        </Card>
-      </div>
+const dealState = {
+  deals: [] as ReadonlyArray<IDeal>,
+  error: false,
+  loading: false
+};
 
-      <LoanListCard />
-    </div>
-  );
+const LoanOverview = (props) => {
+
+  const translation = useContext(Translation);
+  const balance = useContext(UserBalance);
+  const [deals, setDeals] = useState(dealState);
+  const t = translation.translation.LoanOverview;
+
+  useEffect(() => {
+    setDeals(old => ({...old, loading: true}));
+
+    axios.get<IDeal[]>(DEALS_API).then(payload => {
+
+      if (payload.data.length === 0) {
+        props.history.push('/deal/new');
+      } else {
+        setDeals(old => ({...old, loading: false, deals: payload.data, error: false}));
+      }
+
+    }).catch(_ => {
+      message.error(t.dealsFetchError);
+      setDeals(old => ({...old, loading: false, error: true}));
+    });
+
+  }, []);
+
+  return (<LoanListCard />);
 };
 
 export default LoanOverview;

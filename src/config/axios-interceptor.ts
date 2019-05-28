@@ -6,7 +6,13 @@ const TIMEOUT = 1 * 60 * 1000;
 axios.defaults.timeout = TIMEOUT;
 axios.defaults.baseURL = SERVER_API_URL;
 
-const setupAxiosInterceptors = (onUnauthenticated: any) => {
+let onUnauthenticated = () => {};
+
+export const setOnUnauthenticated = (func: () => {}) => {
+  onUnauthenticated = func;
+};
+
+const setupAxiosInterceptors = () => {
 
   const onRequestSuccess = (config: any) => {
     const token = StorageUtils.local.get(AUTH_TOKEN_KEY) ||

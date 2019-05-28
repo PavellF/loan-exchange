@@ -4,6 +4,7 @@ import AppComponent from './app';
 import AuthenticationContext from "./shared/contexts/authentication";
 import NotificationContext from "./shared/contexts/notification";
 import TranslationContext from "./shared/contexts/translation";
+import UserBalanceContext from "./shared/contexts/user-balance";
 
 const rootEl = document.getElementById('root');
 
@@ -12,9 +13,9 @@ const render = Component =>
     <AuthenticationContext>
       <NotificationContext>
         <TranslationContext>
-          <div>
+          <UserBalanceContext>
             <Component/>
-          </div>
+          </UserBalanceContext>
         </TranslationContext>
       </NotificationContext>
     </AuthenticationContext>,

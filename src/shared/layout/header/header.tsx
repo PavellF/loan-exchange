@@ -14,7 +14,7 @@ export const AppHeader = (props) => {
 
   return (
     <React.Fragment>
-      {/*{`loading bar`}*/}
+      {/*{`loading bar ?`}*/}
       <Header style={{boxShadow: '2px 2px 3px rgba(0,0,0,.1)', background: 'white', zIndex: 1}}>
         <div className="Container Header">
           <Brand/>

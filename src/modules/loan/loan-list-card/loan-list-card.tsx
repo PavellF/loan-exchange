@@ -30,22 +30,6 @@ const tabListNoTitle = [
     )
   },
   {
-    key: 'repaid',
-    tab: (
-      <React.Fragment>
-        Repaid <Typography.Text type="secondary">19</Typography.Text>
-      </React.Fragment>
-    )
-  },
-  {
-    key: 'rejected',
-    tab: (
-      <React.Fragment>
-        Rejected <Typography.Text type="secondary">1</Typography.Text>
-      </React.Fragment>
-    )
-  },
-  {
     key: 'all',
     tab: (
       <React.Fragment>

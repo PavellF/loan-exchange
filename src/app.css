@@ -31,17 +31,39 @@
 
 .Row {
   display: flex;
-  align-items: center;
+}
+
+.Around {
+  justify-content: space-around;
 }
 
 .Between {
   justify-content: space-between;
 }
 
+.Width-Full {
+  width: 100%;
+}
+
 .End {
   justify-content: flex-end;
 }
 
+.Margin-Top {
+  margin-top: 24px;
+}
+
+.Margin-Top-Medium {
+  margin-top: 16px;
+}
+
+.Height-Medium {
+  min-height: 136px;
+}
+
+.Text-Right {
+  text-align: right;
+}
 
 .register-card__head {
   display: flex;
@@ -80,17 +102,11 @@
   color: #52c41a;
 }
 
-.create-loan {
-  margin-top: 16px;
-  min-height: 200px;
-  display: flex;
-  align-items: center;
-  flex-flow: column;
-}
+
 
 .create-loan-actions {
-  margin-top: 24px;
-  text-align: right;
+
+
 }
 
 .create-loan-active {

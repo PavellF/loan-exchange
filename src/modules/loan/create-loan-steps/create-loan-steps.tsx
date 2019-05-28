@@ -1,37 +1,39 @@
-import React, {useState} from 'react';
-import {Form, Statistic, Steps} from 'antd';
+import React, {useContext, useState} from 'react';
+import {Form, message, Statistic, Steps} from 'antd';
 import Button from 'antd/lib/button';
 import Card from 'antd/lib/card';
 import InputNumber from 'antd/lib/input-number';
 import Input from 'antd/lib/input';
 import Select from 'antd/lib/select';
-import Switch from 'antd/lib/switch';
 import moment from 'moment';
 import Icon from 'antd/lib/icon';
-import {CREDIT_FEE_PERCENT, CREDIT_MIN_FEE} from "../../../config/constants";
-
-enum Term {
-  DAY,
-  MONTH,
-  YEAR,
-  ALL_PERIOD
-}
+import {
+  CREDIT_FEE_PERCENT,
+  CREDIT_MIN_FEE,
+  DEALS_API,
+  ERROR_NO_MONEY,
+  MIN_CREDIT_AMOUNT
+} from "../../../config/constants";
+import {PaymentInterval} from "../../../shared/model/payment-interval";
+import {Translation} from "../../../shared/contexts/translation";
+import {UserBalance} from "../../../shared/contexts/user-balance";
+import {IDeal} from "../../../shared/model/deal.model";
+import axios from "axios";
+import {coinFormatter, coinParser} from "../../../shared/util/entity-utils";
 
 const Step = Steps.Step;
-const steps = ['Amount', 'Rate', 'Term', 'Options', 'Summary'];
 
 const CreateLoanSteps = props => {
-  const { getFieldDecorator, getFieldValue, validateFields } = props.form;
-  const { balance = 1000 } = props;
-
+  const {getFieldDecorator, getFieldValue, validateFields} = props.form;
   const [currentStep, setCurrentStep] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const translation = useContext(Translation);
+  const balance = useContext(UserBalance);
+  const t = translation.translation.CreateLoanSteps;
+  const steps = [t.amount, t.rate, t.term, t.summary];
 
   const goNext = () => {
-    if (currentStep === 2) {
-      setCurrentStep(4);
-    } else {
-      setCurrentStep(old => old + 1);
-    }
+    setCurrentStep(old => old + 1);
   };
 
   const goBack = () => {
@@ -42,14 +44,36 @@ const CreateLoanSteps = props => {
     event.preventDefault();
     validateFields((err, values) => {
       if (!err) {
-        alert(values.valueOf());
+
+        setLoading(true);
+
+        const newDeal: IDeal = {};
+        newDeal.startBalance = values.credit;
+        newDeal.percent = values.rate;
+        newDeal.term = values.term;
+        newDeal.paymentEvery = values['rate-type'];
+
+        axios.post(DEALS_API, newDeal).then(payload => {
+          const id = payload.data.id;
+          props.history.push(`/loan/${id}`);
+        }).catch(error => {
+
+          setLoading(false);
+
+          if (error.response.data.errorKey === ERROR_NO_MONEY) {
+            message.error(t.noMoney);
+          } else {
+            message.error(t.sendingError);
+          }
+        });
+
       }
     });
   };
 
   const isNextButtonDisabled = (): boolean => {
     if (currentStep === 0) {
-      return getFieldValue('credit') <= 0;
+      return balance.balance < MIN_CREDIT_AMOUNT;
     } else if (currentStep === 1) {
       const number = Number(getFieldValue('rate'));
       return isNaN(number) || number <= 0;
@@ -63,10 +87,7 @@ const CreateLoanSteps = props => {
   const getSuccessRate = () => {
     const term = Number(getFieldValue('term'));
     const rate = Number(getFieldValue('rate'));
-    const fine = Number(getFieldValue('fine'));
-    const rateType = getFieldValue('rate-type');
-    const earlyPayment: boolean = getFieldValue('earlyPayment');
-    const capitalization: boolean = getFieldValue('capitalization');
+    const rateType: PaymentInterval = getFieldValue('rate-type');
     let successRate = 100;
 
     // bigger term - bigger successRate
@@ -79,35 +100,21 @@ const CreateLoanSteps = props => {
     //bigger rate - lesser successRate
     let rateAtomic = 1;
 
-    if (rateType === Term.ALL_PERIOD) {
-      rateAtomic = 1;
-    } else if (rateType === Term.YEAR) {
-      rateAtomic = 1.5;
-    } else if (rateType === Term.MONTH) {
+    if (rateType === PaymentInterval.MONTH) {
       rateAtomic = 2;
-    } else if (rateType === Term.DAY) {
+    } else if (rateType === PaymentInterval.DAY) {
       rateAtomic = 18;
     }
 
-    successRate = successRate - rateAtomic * rate;
+    return Math.max(Math.floor(successRate - rateAtomic * rate), 1);
+  };
 
-    if (fine > 0) {
-      successRate = successRate - (rateAtomic + 9) * fine;
-    }
-
-    if (!earlyPayment) {
-      successRate = successRate - 5;
-    }
-
-    if (!capitalization) {
-      successRate = successRate - 19;
-    }
-
+  const getSuccessRateElement = (rate: number): JSX.Element => {
     let className;
 
-    if (successRate >= 75) {
+    if (rate >= 75) {
       className = 'status_green';
-    } else if (successRate >= 35) {
+    } else if (rate >= 35) {
       className = 'status_yellow';
     } else {
       className = 'status_red';
@@ -115,7 +122,7 @@ const CreateLoanSteps = props => {
 
     return (
       <span>
-        Success rate: <strong className={className}>{`${Math.max(Math.floor(successRate), 1)}%`}</strong>
+        {t.successRate}: <strong className={className}>{`${rate}%`}</strong>
       </span>
     );
   };
@@ -124,29 +131,19 @@ const CreateLoanSteps = props => {
     const credit = Number(getFieldValue('credit'));
     const rate = Number(getFieldValue('rate'));
     let term = Number(getFieldValue('term'));
-    const capitalization: boolean = getFieldValue('capitalization');
-    const rateType: Term = getFieldValue('rate-type');
+    const rateType: PaymentInterval = getFieldValue('rate-type');
 
-    if (rateType === undefined || rateType === Term.ALL_PERIOD) {
+    if (rateType === undefined || rateType === PaymentInterval.ONE_TIME) {
       term = 1;
     }
 
-    let averagePayment;
-    let profit;
-    const percentInPeriod = 1 + rate / 100;
-
-    if (capitalization) {
-      averagePayment = (credit * percentInPeriod ** term * (percentInPeriod - 1)) / (percentInPeriod ** term - 1);
-      profit = averagePayment * term;
-    } else {
-      profit = credit * percentInPeriod ** term;
-      averagePayment = profit / term;
-    }
-
+    const overhead = term * (credit * (rate / 100));
+    let profit = overhead + credit;
+    const averagePayment = profit / term;
     const fee = profit * CREDIT_FEE_PERCENT;
 
     if (isNaN(profit)) {
-      return { profit: credit, fee: 0, averagePayment: 0, profitInPercent: 0 };
+      return {profit: credit, fee: 0, averagePayment: 0, profitInPercent: 0};
     }
 
     if (fee < CREDIT_MIN_FEE) {
@@ -157,22 +154,22 @@ const CreateLoanSteps = props => {
 
     const profitInPercent = (profit / credit) * 100 - 100;
 
-    return { profit: Math.round(profit), fee: Math.round(fee), averagePayment: Math.round(averagePayment), profitInPercent };
+    return {
+      profit: Math.round(profit),
+      fee: Math.round(fee),
+      averagePayment: Math.round(averagePayment),
+      profitInPercent
+    };
   };
 
   const getTermSuffix = (): string => {
-    const rateType = getFieldValue('rate-type');
-    let suffix = '';
+    const rateType: PaymentInterval = getFieldValue('rate-type');
 
-    if (rateType === Term.ALL_PERIOD || rateType === Term.DAY) {
-      suffix = 'day';
-    } else if (rateType === Term.YEAR) {
-      suffix = 'year';
-    } else if (rateType === Term.MONTH) {
-      suffix = 'month';
+    if (rateType === PaymentInterval.MONTH) {
+      return 'month';
     }
 
-    return suffix;
+    return 'day';
   };
 
   const getEndTermDate = () => {
@@ -182,144 +179,107 @@ const CreateLoanSteps = props => {
   };
 
   const expectedProfit = getExpectedProfit();
-  const successRate = getSuccessRate();
+  const successRateValue = getSuccessRate();
+  const successRate = getSuccessRateElement(successRateValue);
   const termSuffix = getTermSuffix();
+  const paymentInterval: PaymentInterval = getFieldValue('rate-type');
 
   return (
     <Card>
       <Form onSubmit={handleFormSubmission}>
         <Steps current={currentStep}>
-          {steps.map(item => (
-            <Step key={item} title={item} />
-          ))}
+          {steps.map(item => (<Step key={item} title={item}/>))}
         </Steps>
-        <div className="create-loan">
-          <div className={currentStep === 0 ? 'create-loan-active' : 'hidden'}>
-            <Form.Item label="Amount to lend">
-              {getFieldDecorator('credit', { initialValue: balance })(
+        <div className="Column Centered Margin-Top-Medium">
+
+          <div className={currentStep === 0 ? 'Column' : 'Hidden'}>
+            <Form.Item label={t.amountToLend}>
+              {getFieldDecorator('credit', {initialValue: MIN_CREDIT_AMOUNT})(
                 <InputNumber
-                  formatter={value => `¢ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                  parser={value => Number(value ? value.replace(/\¢\s?|(,*)/g, '') : 0)}
-                  style={{ width: '100%' }}
+                  formatter={coinFormatter}
+                  parser={coinParser}
+                  style={{width: '100%'}}
                   size="large"
                   precision={0}
-                  min={500}
-                  max={balance}
+                  min={MIN_CREDIT_AMOUNT}
+                  max={Math.max(balance.balance, MIN_CREDIT_AMOUNT)}
                 />
               )}
             </Form.Item>
-            <p>Allowed to spend: {balance}¢</p>
-            <Button type="primary">Recharge</Button>
+            <p>{`${t.allowedToSpend}: ${balance.balance}¢`}</p>
+            <Button type="primary">{t.refill}</Button>
           </div>
 
-          <div className={currentStep === 1 ? 'create-loan-active' : 'hidden'}>
-            <Form.Item label="Set your rate">
-              {getFieldDecorator('rate', { initialValue: '1' })(
-                <Input
-                  size="large"
-                  suffix="%"
-                  addonAfter={getFieldDecorator('rate-type', { initialValue: Term.ALL_PERIOD })(
-                    <Select>
-                      <Select.Option value={Term.ALL_PERIOD}>All Period</Select.Option>
-                      <Select.Option value={Term.DAY}>Per Day</Select.Option>
-                      <Select.Option value={Term.MONTH}>Per Months</Select.Option>
-                      <Select.Option value={Term.YEAR}>Per Years</Select.Option>
-                    </Select>
-                  )}
-                />
+          <div className={currentStep === 1 ? 'Column' : 'Hidden'}>
+            <Form.Item label={t.setRate}>
+              {getFieldDecorator('rate', {initialValue: '1'})(
+                <Input size="large" suffix="%"
+                       addonAfter={getFieldDecorator('rate-type', {initialValue: PaymentInterval.ONE_TIME})(
+                         <Select>
+                           <Select.Option value={PaymentInterval.ONE_TIME}>{t.oneTime}</Select.Option>
+                           <Select.Option value={PaymentInterval.DAY}>{t.day}</Select.Option>
+                           <Select.Option value={PaymentInterval.MONTH}>{t.month}</Select.Option>
+                         </Select>
+                       )}/>
               )}
             </Form.Item>
-            <p>
-              Expected profit: {expectedProfit.profit}¢. Fee is {expectedProfit.fee}¢.
-            </p>
+            <p>{`${t.expectedProfit}: ${expectedProfit.profit}¢. ${t.fee} ${expectedProfit.fee}¢.`}</p>
             <p>{successRate}</p>
           </div>
 
-          <div className={currentStep === 2 ? 'create-loan-active' : 'hidden'}>
-            <Form.Item label={`Length of term ${termSuffix}s`}>
-              {getFieldDecorator('term', { initialValue: 1 })(<InputNumber style={{ width: '100%' }} size="large" precision={0} min={1} />)}
+          <div className={currentStep === 2 ? 'Column' : 'Hidden'}>
+            <Form.Item label={t.lengthOfTerm(termSuffix)}>
+              {getFieldDecorator('term', {initialValue: 1})
+              (<InputNumber style={{width: '100%'}} size="large" precision={0} min={1} max={999}/>)}
             </Form.Item>
-            <p>{`End date: ${getEndTermDate().calendar()}`}</p>
-            <p>
-              Expected profit: {expectedProfit.profit}¢. Fee is {expectedProfit.fee}¢.
-            </p>
+            <p>{`${t.endDate}: ${getEndTermDate().calendar()}`}</p>
+            <p>{`${t.expectedProfit}: ${expectedProfit.profit}¢. ${t.fee} ${expectedProfit.fee}¢.`}</p>
+            <p>{`${t.averagePayment}: ${expectedProfit.averagePayment}¢.`}</p>
             <p>{successRate}</p>
           </div>
 
-          <div className={currentStep === 3 ? 'create-loan-active' : 'hidden'}>
-            <Form.Item label={`Set fine (not recommended)`}>
-              {getFieldDecorator('fine', { initialValue: 0 })(<InputNumber style={{ width: '100%' }} size="large" precision={2} min={0} />)}
-            </Form.Item>
-
-            <p>Some % if debtor could not pay in time.</p>
-
-            <Form.Item label="Capitalization">
-              {getFieldDecorator('capitalization', { valuePropName: 'checked', initialValue: true })(<Switch />)}
-            </Form.Item>
-
-            <Form.Item label="Early payment">
-              {getFieldDecorator('earlyPayment', { valuePropName: 'checked', initialValue: true })(<Switch />)}
-            </Form.Item>
-
-            <p>
-              Expected profit: {expectedProfit.profit}¢. Fee is {expectedProfit.fee}¢.
-            </p>
-            <p>Average payment: {expectedProfit.averagePayment}¢.</p>
-            <p>{successRate}</p>
-          </div>
-
-          <div className={currentStep === 4 ? 'create-loan-active create-loan-summary' : 'hidden'}>
-            <div className="create-loan-summary__column">
-              <Statistic title="Amount" value={getFieldValue('credit')} suffix={`¢`} />
+          <div className={currentStep === 3 ? 'Row Around Width-Full Height-Medium' : 'Hidden'}>
+            <div className="Column Between">
+              <Statistic title={t.amount} value={getFieldValue('credit')} suffix={`¢`}/>
               <Statistic
-                title="Revenue"
-                value={expectedProfit.profit}
+                title={t.revenue}
+                value={`${expectedProfit.profit}¢`}
                 suffix={
                   <Statistic
                     value={expectedProfit.profitInPercent}
                     precision={2}
-                    valueStyle={{ color: expectedProfit.profitInPercent > 0 ? '#3f8600' : '#cf1322' }}
-                    prefix={expectedProfit.profitInPercent > 0 ? <Icon type="arrow-up" /> : <Icon type="arrow-down" />}
+                    valueStyle={{color: expectedProfit.profitInPercent > 0 ? '#3f8600' : '#cf1322'}}
+                    prefix={expectedProfit.profitInPercent > 0 ? <Icon type="arrow-up"/> : <Icon type="arrow-down"/>}
                     suffix="%"
                   />
                 }
               />
-              <Statistic title="Rate" value={getFieldValue('rate')} suffix={`% per ${termSuffix}`} />
             </div>
-
-            <div className="create-loan-summary__column">
-              <Statistic title="Term" value={getFieldValue('term')} suffix={`${termSuffix}`} />
-              <Statistic title="Fee" value={expectedProfit.fee} suffix={`¢`} />
-              <Statistic title="Average payment" value={expectedProfit.averagePayment} suffix={`¢ in ${termSuffix}`} />
+            <div className="Column Between">
+              <Statistic title={t.rate} value={getFieldValue('rate')} suffix={`% ${t.perTemporal(paymentInterval)}`}/>
+              <Statistic title={t.term} value={getFieldValue('term')} suffix={`${t.temporal(paymentInterval)}`}/>
             </div>
-
-            <div className="create-loan-summary__column">
-              <Statistic title="Capitalization" value={getFieldValue('capitalization') ? 'Yes' : 'No'} />
-              <Statistic title="Early payment" value={getFieldValue('earlyPayment') ? 'Yes' : 'No'} />
-              <Statistic title="Fine" value={getFieldValue('fine')} suffix={`%`} />
+            <div className="Column Between">
+              <Statistic title={t.averagePayment} value={expectedProfit.averagePayment}
+                         suffix={`¢ ${t.perTemporal(paymentInterval)}`}/>
+              <Statistic title={t.successRate} value={successRateValue} suffix={`%`}/>
             </div>
           </div>
+
         </div>
-        <div className="create-loan-actions">
-          {currentStep > 0 && (
-            <Button style={{ marginRight: 8 }} onClick={goBack}>
-              Previous
-            </Button>
+
+        <div className="Margin-Top Text-Right">
+          {currentStep > 0 &&
+          (<Button disabled={loading} style={{marginRight: 8}} onClick={goBack}>{t.previous}</Button>)}
+          {currentStep < steps.length - 1 &&
+          (<Button type="primary" disabled={isNextButtonDisabled()} onClick={goNext}>{t.next}</Button>
           )}
-          {currentStep < steps.length - 1 && (
-            <Button type="primary" disabled={isNextButtonDisabled()} onClick={goNext}>
-              Next
-            </Button>
-          )}
-          {currentStep === steps.length - 1 && (
-            <Button htmlType="submit" type="primary">
-              Done
-            </Button>
-          )}
+          {currentStep === steps.length - 1 &&
+          (<Button loading={loading} htmlType="submit" type="primary">{t.done}</Button>)}
         </div>
       </Form>
     </Card>
   );
 };
 
-export default Form.create({ name: 'create_loan' })(CreateLoanSteps);
+export default Form.create({name: 'create_loan'})(CreateLoanSteps);

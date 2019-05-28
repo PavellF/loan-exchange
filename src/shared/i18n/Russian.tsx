@@ -1,6 +1,51 @@
 import React from 'react';
+import {PaymentInterval} from "../model/payment-interval";
 
 export default {
+  LoanOverview: {
+    dealsFetchError: "Не удалось загрузить сделки, попробуйте позже."
+  },
+  CreateLoanSteps: {
+    allowedToSpend: "Доступно для использования",
+    refill: "Пополнить",
+    amountToLend: "Сколько отдать в долг",
+    setRate: "Установите процент",
+    oneTime: "За все время",
+    day: "В день",
+    month: "В месяц",
+    expectedProfit: "Ожидаемая прибыль",
+    fee: "Коммисия",
+    successRate: "Вероятность успеха",
+    lengthOfTerm: (unit: string) => unit === 'month' ? "Срок займа месяцев" : "Срок займа дней",
+    perTemporal: (unit: PaymentInterval): string => {
+      if (unit === PaymentInterval.MONTH) {
+        return "в месяц";
+      } else if (unit === PaymentInterval.DAY) {
+        return "в день";
+      } else {
+        return "за все время"
+      }
+    },
+    temporal: (unit: PaymentInterval): string => {
+      if (unit === PaymentInterval.MONTH) {
+        return "месяц";
+      } else {
+        return "день";
+      }
+    },
+    endDate: "Дата окончания",
+    averagePayment: "Средний платеж",
+    amount: "Сумма",
+    revenue: "Прибыль",
+    rate: "Процент",
+    term: "Срок",
+    previous: "Назад",
+    next: "Далее",
+    done: "Разместить",
+    summary: "Подтверждение",
+    sendingError: "Невозможно создать сделку, попробуйте позже.",
+    noMoney: "На балансе не достаточно средств для открытия сделки."
+  },
   AuthFlow: {
     signIn: "Войти",
     usingAccount: 'Используя аккаунт loanExchange',
