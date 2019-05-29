@@ -1,44 +1,158 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {message} from 'antd';
-import LoanListCard from "./loan-list-card/loan-list-card";
 import {Translation} from "../../shared/contexts/translation";
 import {UserBalance} from "../../shared/contexts/user-balance";
 import axios from "axios";
-import {DEALS_API} from "../../config/constants";
+import {AUTHORITIES, DEALS_API, ITEMS_PER_PAGE} from "../../config/constants";
 import {IDeal} from "../../shared/model/deal.model";
+import {Authentication} from "../../shared/contexts/authentication";
+import LoanSearchForm from "./loan-search-form/loan-search-form";
+import Card from "antd/lib/card";
+import LoanListCard, {Tabs} from "./loan-list-card/loan-list-card";
+import {DealStatus} from "../../shared/model/deal-status";
+import {parseHeaderForLinks} from "../../shared/util/url-utils";
+import {loadMoreDataWhenScrolled} from "../../shared/util/entity-utils";
+import {getSortState} from "../../shared/util/pagination-utils";
+import {Moment} from "moment";
 
 const dealState = {
   deals: [] as ReadonlyArray<IDeal>,
-  error: false,
-  loading: false
+  links: {next: 0},
+  totalItems: 0,
+  currentTab: Tabs.ACTIVE,
+  endDateIntervalStart: 0,
+  withStartBalance: 0
 };
 
 const LoanOverview = (props) => {
-
   const translation = useContext(Translation);
   const balance = useContext(UserBalance);
-  const [deals, setDeals] = useState(dealState);
+  const auth = useContext(Authentication);
+  const authorities = auth.account.authorities as string[];
   const t = translation.translation.LoanOverview;
+  const isCreditor = authorities.find(a => a === AUTHORITIES.CREDITOR);
+  const [deals, setDeals] = useState({
+    ...dealState,
+    ...getSortState(props.location, ITEMS_PER_PAGE),
+    currentTab: isCreditor ? Tabs.ACTIVE : Tabs.SEARCH
+  });
 
-  useEffect(() => {
-    setDeals(old => ({...old, loading: true}));
+  const loadDeals = (url, append = true) => {
+    const dismiss = message.loading(t.dealLoading, 0);
 
-    axios.get<IDeal[]>(DEALS_API).then(payload => {
-
-      if (payload.data.length === 0) {
-        props.history.push('/deal/new');
-      } else {
-        setDeals(old => ({...old, loading: false, deals: payload.data, error: false}));
-      }
-
+    axios.get<IDeal[]>(url).then(payload => {
+      const links = parseHeaderForLinks(payload.headers.link);
+      const totalItems = payload.headers['x-total-count'];
+      setDeals(old => ({
+        ...old,
+        deals: append ? loadMoreDataWhenScrolled(old.deals, payload.data, links) : payload.data,
+        links,
+        totalItems
+      }));
+      dismiss();
     }).catch(_ => {
+      dismiss();
       message.error(t.dealsFetchError);
-      setDeals(old => ({...old, loading: false, error: true}));
     });
+  };
 
-  }, []);
+  const searchDeals = (amount: number, minDays: Moment) => {
+    setDeals(old => {
+      const newState = {
+        ...old,
+        endDateIntervalStart: minDays.unix(),
+        withStartBalance: amount,
+        currentTab: Tabs.SEARCH,
+        sort: 'successRate',
+        order: 'DESC'
+      };
 
-  return (<LoanListCard />);
+      loadDeals(getUrl(newState), false);
+      return newState;
+    });
+  };
+
+  const handleTabChange = (currentTab: Tabs) => {
+    setDeals(old => {
+      const newState = {
+        ...old,
+        currentTab,
+        sort: 'id',
+        order: 'DESC'
+      };
+      loadDeals(getUrl(newState), false);
+      return newState;
+    });
+  };
+
+  const handleInfiniteOnLoad = () => {
+    setDeals(old => {
+      const newState = {...old, activePage: old.activePage + 1};
+      loadDeals(getUrl(newState));
+      return newState;
+    });
+  };
+
+  const getUrl = (state): string => {
+    const {activePage, itemsPerPage, sort, order, currentTab, endDateIntervalStart, withStartBalance} = state;
+    const params: string[] = [];
+    params.push(`page=${activePage - 1}`);
+    params.push(`size=${itemsPerPage}`);
+    params.push(`sort=${sort},${order}`);
+
+    if (currentTab === Tabs.SEARCH || currentTab === Tabs.PENDING) {
+      params.push(`withStatus=${DealStatus.PENDING}`);
+    } else if (currentTab === Tabs.ACTIVE) {
+      params.push(`withStatus=${DealStatus.ACTIVE}`);
+    }
+
+    if (currentTab === Tabs.SEARCH) {
+      params.push(`endDateIntervalStart=${endDateIntervalStart}`);
+      params.push(`withStartBalance=${withStartBalance}`);
+    }
+
+    const url = `${DEALS_API}?${params.join('&')}`;
+    return url;
+  };
+
+  const dealClickHandler = (event: React.MouseEvent<HTMLElement>, dealId?: number) => {
+    props.history.push(`/loan/${dealId}`);
+  };
+
+  const showOnlyTabs = new Set<Tabs>();
+  let topCard;
+
+  if (isCreditor) {
+    topCard = (
+      <div className="Margin-Bottom">
+        <Card title={t.dealSearch}>
+          <div className="Line-Centered">
+            <LoanSearchForm onSearchClicked={searchDeals}/>
+          </div>
+        </Card>
+      </div>
+    );
+    showOnlyTabs.add(Tabs.ACTIVE);
+    showOnlyTabs.add(Tabs.PENDING);
+    showOnlyTabs.add(Tabs.ALL);
+    showOnlyTabs.add(Tabs.SEARCH)
+  } else {
+
+  }
+
+  return (
+    <>
+      {topCard}
+      <LoanListCard handleInfiniteOnLoad={handleInfiniteOnLoad}
+                    dealClickHandler={dealClickHandler}
+                    hasMore={deals.activePage - 1 < deals.links.next}
+                    pageStart={deals.activePage}
+                    showOnlyTabs={showOnlyTabs}
+                    active={deals.currentTab}
+                    deals={deals.deals}
+                    tabChanged={handleTabChange}/>
+    </>
+  );
 };
 
 export default LoanOverview;

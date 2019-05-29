@@ -2,8 +2,43 @@ import React from 'react';
 import {PaymentInterval} from "../model/payment-interval";
 
 export default {
+  LoanSearchForm: {
+    search: "Поиск",
+    creditAmount: "Сумма",
+    whenCanReturn: "Могу отдать"
+  },
   LoanOverview: {
-    dealsFetchError: "Не удалось загрузить сделки, попробуйте позже."
+    dealsFetchError: "Не удалось загрузить сделки, попробуйте позже.",
+    dealSearch: "Поиск кредита",
+    dealLoading: "Идет загрузка"
+  },
+  LoanListCard: {
+    searchTab: "Поиск",
+    activeTab: "Активные",
+    pending: "В ожидании",
+    all: "Все"
+  },
+  LoanEntry: {
+    amount: "Сумма",
+    revenue: "Прибыль",
+    rate: "Процент",
+    term: "Срок",
+    perTemporal: (unit: PaymentInterval): string => {
+      if (unit === PaymentInterval.MONTH) {
+        return "в месяц";
+      } else if (unit === PaymentInterval.DAY) {
+        return "в день";
+      } else {
+        return "за все время"
+      }
+    },
+    temporal: (unit: PaymentInterval): string => {
+      if (unit === PaymentInterval.MONTH) {
+        return "месяц";
+      } else {
+        return "день";
+      }
+    },
   },
   CreateLoanSteps: {
     allowedToSpend: "Доступно для использования",

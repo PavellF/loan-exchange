@@ -1,4 +1,4 @@
-export const enum DealStatus {
+export enum DealStatus {
   PENDING = 'PENDING',
   ACTIVE = 'ACTIVE',
   CLOSED = 'CLOSED',

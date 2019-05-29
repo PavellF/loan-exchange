@@ -29,6 +29,10 @@
   align-items: center;
 }
 
+.Line-Centered {
+  text-align: center;
+}
+
 .Row {
   display: flex;
 }
@@ -51,6 +55,14 @@
 
 .Margin-Top {
   margin-top: 24px;
+}
+
+.Margin-Bottom {
+  margin-bottom: 24px;
+}
+
+.Self-Center {
+  align-self: center;
 }
 
 .Margin-Top-Medium {

@@ -1,46 +1,55 @@
-import React, {useEffect} from 'react';
+import React, {useContext} from 'react';
 import {DatePicker, Form} from 'antd';
 import Input from 'antd/lib/input';
 import Icon from 'antd/lib/icon';
 import Button from 'antd/lib/button';
-import Checkbox from 'antd/lib/checkbox';
+import {Translation} from "../../../shared/contexts/translation";
+import {FormComponentProps} from "antd/lib/form";
+import moment, {Moment} from "moment";
 
-function hasErrors(fieldsError) {
-  return Object.keys(fieldsError).some(field => fieldsError[field]);
+interface LoanSearchFormProps extends FormComponentProps {
+  onSearchClicked: (amount: number, minDays: Moment) => void;
 }
 
 const LoanSearchForm = props => {
-  useEffect(() => {
-    props.form.validateFields();
-  }, []);
+  const translation = useContext(Translation);
+  const t = translation.translation.LoanSearchForm;
+  const { getFieldDecorator, validateFields, getFieldValue } = props.form;
 
   const handleSubmit = e => {
     e.preventDefault();
-    props.form.validateFields((err, values) => {
+    validateFields((err, values) => {
       if (!err) {
-        console.log('Received values of form: ', values);
+        props.onSearchClicked(values.amount, values.minDays);
       }
     });
   };
 
-  const { getFieldDecorator, getFieldsError, getFieldError, isFieldTouched } = props.form;
+  const canNotSubmit = (): boolean => {
+    const amount: number = getFieldValue('amount');
+    const minDays: Moment = getFieldValue('minDays');
+    return !amount || !minDays || minDays.isBefore(moment());
+  };
 
   return (
     <Form layout="inline" onSubmit={handleSubmit}>
       <Form.Item>
         {getFieldDecorator('amount', { initialValue: 100 })(
-          <Input type="number" prefix={<Icon type="dollar" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="Credit amount" />
+          <Input min="100" type="number" size="large"
+                 prefix={<Icon type="dollar" style={{ color: 'rgba(0,0,0,.25)' }} />}
+                 placeholder={t.creditAmount} />
         )}
       </Form.Item>
-      <Form.Item>{getFieldDecorator('minDays')(<DatePicker placeholder="For days" />)}</Form.Item>
-      <Form.Item>{getFieldDecorator('password', { initialValue: true })(<Checkbox>Досрочное погашение</Checkbox>)}</Form.Item>
+      <Form.Item>{
+        getFieldDecorator('minDays')(<DatePicker size="large" placeholder={t.whenCanReturn} />)
+      }</Form.Item>
       <Form.Item>
-        <Button type="primary" htmlType="submit" disabled={hasErrors(getFieldsError())}>
-          Search
+        <Button size="large" type="primary" htmlType="submit" disabled={canNotSubmit()}>
+          {t.search}
         </Button>
       </Form.Item>
     </Form>
   );
 };
 
-export default Form.create({ name: 'search_loan_form' })(LoanSearchForm);
+export default Form.create<LoanSearchFormProps>({ name: 'search_loan_form' })(LoanSearchForm);
