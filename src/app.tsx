@@ -16,6 +16,7 @@ import {Layout} from "antd";
 import {AppHeader} from "./shared/layout/header/header";
 import Routes from "./routes";
 import {UserBalance} from "./shared/contexts/user-balance";
+import {Notifications} from "./shared/contexts/notification";
 
 setupAxiosInterceptors();
 
@@ -28,14 +29,21 @@ export const App = (props: any) => {
   const auth = useContext(Authentication);
   const translation = useContext(Translation);
   const balance = useContext(UserBalance);
+  const notifications = useContext(Notifications);
 
   useEffect(() => {
     auth.getSession();
     balance.update();
+    notifications.fetchNotificationsCount();
+
     setOnUnauthenticated(() => auth.clearAuthentication);
-    const balanceUpdateInterval = setInterval(balance.update, 60000); // 60 sec.
+
+    const updateInterval = setInterval(() => {
+      balance.update();
+      notifications.fetchNotificationsCount();
+    }, 60000); // 60 sec.
     return () => {
-      clearInterval(balanceUpdateInterval);
+      clearInterval(updateInterval);
     };
   }, []);
 
@@ -54,10 +62,10 @@ export const App = (props: any) => {
     if (auth.account && auth.account.langKey) {
       translation.setLanguage(auth.account.langKey);
     }
-
+    {/*<AppHeader/>*/}
     pageBody = (
       <Layout>
-        <AppHeader/>
+        <Route component={AppHeader}/>
 
         <Layout className="Container">
           <Layout style={{padding: '18px 0px', minHeight: 'calc(100vh - 64px - 108px)'}}>

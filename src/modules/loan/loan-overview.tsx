@@ -1,7 +1,6 @@
 import React, {useContext, useState} from 'react';
 import {message} from 'antd';
 import {Translation} from "../../shared/contexts/translation";
-import {UserBalance} from "../../shared/contexts/user-balance";
 import axios from "axios";
 import {AUTHORITIES, DEALS_API, ITEMS_PER_PAGE} from "../../config/constants";
 import {IDeal} from "../../shared/model/deal.model";
@@ -33,7 +32,6 @@ const dealState = {
 
 const LoanOverview = (props) => {
   const translation = useContext(Translation);
-  const balance = useContext(UserBalance);
   const auth = useContext(Authentication);
   const authorities = auth.account.authorities as string[];
   const t = translation.translation.LoanOverview;

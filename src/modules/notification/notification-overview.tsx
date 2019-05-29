@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {Card} from 'antd';
 import Button from 'antd/lib/button';
 import List from 'antd/lib/list';
@@ -8,6 +8,7 @@ import Typography from 'antd/lib/typography';
 import {INotification} from "../../shared/model/notification.model";
 import {BalanceLogEvent} from "../../shared/model/balance-log-event";
 import moment from "moment";
+import {Notifications} from "../../shared/contexts/notification";
 
 const ListItem = (item: INotification) => {
   let text = 'Ant Design, a design language for background applications, is refined by Ant UED Team';
@@ -32,6 +33,7 @@ const ListItem = (item: INotification) => {
 };
 
 const NotificationOverview = props => {
+  const notifications = useContext(Notifications);
   const notification: INotification = {};
   notification.id = 1;
   notification.date = moment();

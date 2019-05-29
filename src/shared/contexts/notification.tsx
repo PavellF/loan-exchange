@@ -12,7 +12,7 @@ const initialState = {
   deleteNotification: (id: number) => {},
 };
 
-export const Notification = React.createContext(initialState);
+export const Notifications = React.createContext(initialState);
 
 const NotificationContext = (props) => {
 
@@ -84,9 +84,9 @@ const NotificationContext = (props) => {
   };
 
   return (
-    <Notification.Provider value={context}>
+    <Notifications.Provider value={context}>
       {props.children}
-    </Notification.Provider>
+    </Notifications.Provider>
   );
 
 };
