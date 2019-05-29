@@ -13,7 +13,7 @@ export enum Tabs {
   ACTIVE = 'ACTIVE',
   PENDING = 'PENDING',
   ALL = 'ALL'
-};
+}
 
 const gridStyle = {
   width: '100%',
@@ -86,7 +86,7 @@ const LoanListCard = (props: LoanListCardProps) => {
       );
     });
   } else {
-    tabBody = <Empty image={Empty.PRESENTED_IMAGE_SIMPLE}/>;
+    tabBody = <Empty description={t.noItems} image={Empty.PRESENTED_IMAGE_SIMPLE}/>;
   }
 
   return (

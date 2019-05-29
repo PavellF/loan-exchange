@@ -14,6 +14,13 @@ import {parseHeaderForLinks} from "../../shared/util/url-utils";
 import {loadMoreDataWhenScrolled} from "../../shared/util/entity-utils";
 import {getSortState} from "../../shared/util/pagination-utils";
 import {Moment} from "moment";
+import Typography from "antd/lib/typography";
+import Button from "antd/lib/button";
+import LoanSuggestion from "./loan-suggestion/loan-suggestion";
+import {PaymentInterval} from "../../shared/model/payment-interval";
+import Icon from "antd/lib/icon";
+
+const {Title} = Typography;
 
 const dealState = {
   deals: [] as ReadonlyArray<IDeal>,
@@ -123,6 +130,42 @@ const LoanOverview = (props) => {
   let topCard;
 
   if (isCreditor) {
+
+    const onSuccessfulCreate = (id: number) => {
+      props.history.push(`/loan/${id}`);
+    };
+
+    const onNewDealClicked = () => {
+      props.history.push('/loan/new');
+    };
+
+    topCard = (
+      <div className="Margin-Bottom">
+        <Card title={t.instantDeal}>
+          <div className="Row Around">
+            <Card type="inner">
+              <LoanSuggestion title={<>{t.deal} 1 <Icon type="dollar" theme="twoTone" /></>}
+                              term={3} paymentEvery={PaymentInterval.MONTH} percent={9} onSuccess={onSuccessfulCreate}/>
+            </Card>
+            <Card type="inner">
+              <LoanSuggestion title={<>{t.deal} 2 <Icon type="dollar" theme="twoTone" /></>}
+                              term={30} paymentEvery={PaymentInterval.DAY} percent={1} onSuccess={onSuccessfulCreate}/>
+            </Card>
+            <Card type="inner">
+              <LoanSuggestion title={<>{t.deal} 3 <Icon type="dollar" theme="twoTone" /></>}
+                              term={90} paymentEvery={PaymentInterval.ONE_TIME} percent={25} onSuccess={onSuccessfulCreate}/>
+            </Card>
+          </div>
+          <div className="Line-Centered Margin-Top">
+            <Button size="large" type="dashed" onClick={onNewDealClicked}>{t.newDeal}</Button>
+          </div>
+        </Card>
+      </div>
+    );
+    showOnlyTabs.add(Tabs.ACTIVE);
+    showOnlyTabs.add(Tabs.PENDING);
+    showOnlyTabs.add(Tabs.ALL);
+  } else {
     topCard = (
       <div className="Margin-Bottom">
         <Card title={t.dealSearch}>
@@ -133,11 +176,8 @@ const LoanOverview = (props) => {
       </div>
     );
     showOnlyTabs.add(Tabs.ACTIVE);
-    showOnlyTabs.add(Tabs.PENDING);
     showOnlyTabs.add(Tabs.ALL);
     showOnlyTabs.add(Tabs.SEARCH)
-  } else {
-
   }
 
   return (

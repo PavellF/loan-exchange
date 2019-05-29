@@ -7,19 +7,14 @@ import Input from 'antd/lib/input';
 import Select from 'antd/lib/select';
 import moment from 'moment';
 import Icon from 'antd/lib/icon';
-import {
-  CREDIT_FEE_PERCENT,
-  CREDIT_MIN_FEE,
-  DEALS_API,
-  ERROR_NO_MONEY,
-  MIN_CREDIT_AMOUNT
-} from "../../../config/constants";
+import {DEALS_API, ERROR_NO_MONEY, MIN_CREDIT_AMOUNT} from "../../../config/constants";
 import {PaymentInterval} from "../../../shared/model/payment-interval";
 import {Translation} from "../../../shared/contexts/translation";
 import {UserBalance} from "../../../shared/contexts/user-balance";
-import {IDeal} from "../../../shared/model/deal.model";
+import {getSuccessRate, IDeal} from "../../../shared/model/deal.model";
 import axios from "axios";
 import {coinFormatter, coinParser} from "../../../shared/util/entity-utils";
+import {getExpectedProfit} from "../../../shared/util/math-utils";
 
 const Step = Steps.Step;
 
@@ -84,31 +79,6 @@ const CreateLoanSteps = props => {
     return false;
   };
 
-  const getSuccessRate = () => {
-    const term = Number(getFieldValue('term'));
-    const rate = Number(getFieldValue('rate'));
-    const rateType: PaymentInterval = getFieldValue('rate-type');
-    let successRate = 100;
-
-    // bigger term - bigger successRate
-    const termModifier = 20;
-    const termRate = Math.round(term / termModifier);
-    if (termRate < termModifier) {
-      successRate = successRate - (termModifier - termRate);
-    }
-
-    //bigger rate - lesser successRate
-    let rateAtomic = 1;
-
-    if (rateType === PaymentInterval.MONTH) {
-      rateAtomic = 2;
-    } else if (rateType === PaymentInterval.DAY) {
-      rateAtomic = 18;
-    }
-
-    return Math.max(Math.floor(successRate - rateAtomic * rate), 1);
-  };
-
   const getSuccessRateElement = (rate: number): JSX.Element => {
     let className;
 
@@ -127,41 +97,6 @@ const CreateLoanSteps = props => {
     );
   };
 
-  const getExpectedProfit = () => {
-    const credit = Number(getFieldValue('credit'));
-    const rate = Number(getFieldValue('rate'));
-    let term = Number(getFieldValue('term'));
-    const rateType: PaymentInterval = getFieldValue('rate-type');
-
-    if (rateType === undefined || rateType === PaymentInterval.ONE_TIME) {
-      term = 1;
-    }
-
-    const overhead = term * (credit * (rate / 100));
-    let profit = overhead + credit;
-    const averagePayment = profit / term;
-    const fee = profit * CREDIT_FEE_PERCENT;
-
-    if (isNaN(profit)) {
-      return {profit: credit, fee: 0, averagePayment: 0, profitInPercent: 0};
-    }
-
-    if (fee < CREDIT_MIN_FEE) {
-      profit = profit - CREDIT_MIN_FEE;
-    } else {
-      profit = profit - fee;
-    }
-
-    const profitInPercent = (profit / credit) * 100 - 100;
-
-    return {
-      profit: Math.round(profit),
-      fee: Math.round(fee),
-      averagePayment: Math.round(averagePayment),
-      profitInPercent
-    };
-  };
-
   const getTermSuffix = (): string => {
     const rateType: PaymentInterval = getFieldValue('rate-type');
 
@@ -178,11 +113,14 @@ const CreateLoanSteps = props => {
     return moment().add(term, getTermSuffix());
   };
 
-  const expectedProfit = getExpectedProfit();
-  const successRateValue = getSuccessRate();
+  const paymentInterval: PaymentInterval = getFieldValue('rate-type');
+  const rate = Number(getFieldValue('rate'));
+  const term = Number(getFieldValue('term'));
+  const credit = Number(getFieldValue('credit'));
+  const expectedProfit = getExpectedProfit(credit, rate, term, paymentInterval);
+  const successRateValue = getSuccessRate(term, rate, paymentInterval);
   const successRate = getSuccessRateElement(successRateValue);
   const termSuffix = getTermSuffix();
-  const paymentInterval: PaymentInterval = getFieldValue('rate-type');
 
   return (
     <Card>

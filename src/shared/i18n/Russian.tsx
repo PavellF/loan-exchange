@@ -10,13 +10,17 @@ export default {
   LoanOverview: {
     dealsFetchError: "Не удалось загрузить сделки, попробуйте позже.",
     dealSearch: "Поиск кредита",
-    dealLoading: "Идет загрузка"
+    instantDeal: "Быстрый займ",
+    deal: "Займ",
+    dealLoading: "Идет загрузка",
+    newDeal: "Новая сделка",
   },
   LoanListCard: {
     searchTab: "Поиск",
     activeTab: "Активные",
     pending: "В ожидании",
-    all: "Все"
+    all: "Все",
+    noItems: "Пусто"
   },
   LoanEntry: {
     amount: "Сумма",
@@ -69,7 +73,7 @@ export default {
       }
     },
     endDate: "Дата окончания",
-    averagePayment: "Средний платеж",
+    averagePayment: "Средняя прибыль",
     amount: "Сумма",
     revenue: "Прибыль",
     rate: "Процент",

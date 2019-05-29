@@ -20,3 +20,25 @@ export interface IDeal {
 }
 
 export const defaultValue: Readonly<IDeal> = {};
+
+export const getSuccessRate = (term: number, rate: number, rateType: PaymentInterval) => {
+  let successRate = 100;
+
+  // bigger term - bigger successRate
+  const termModifier = 20;
+  const termRate = Math.round(term / termModifier);
+  if (termRate < termModifier) {
+    successRate = successRate - (termModifier - termRate);
+  }
+
+  //bigger rate - lesser successRate
+  let rateAtomic = 1;
+
+  if (rateType === PaymentInterval.MONTH) {
+    rateAtomic = 2;
+  } else if (rateType === PaymentInterval.DAY) {
+    rateAtomic = 18;
+  }
+
+  return Math.max(Math.floor(successRate - rateAtomic * rate), 1);
+};
