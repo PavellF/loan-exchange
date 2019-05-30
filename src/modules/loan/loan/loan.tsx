@@ -10,7 +10,6 @@ import {AUTHORITIES, DEALS_API} from "../../../config/constants";
 import {defaultValue, getSuccessRateForDeal, IDeal} from "../../../shared/model/deal.model";
 import axios from "axios";
 import {DealStatus, getStatusColor} from "../../../shared/model/deal-status";
-import {Redirect} from "react-router";
 import {getExpectedProfitForDeal} from "../../../shared/util/math-utils";
 
 export const Loan = props => {
@@ -20,7 +19,6 @@ export const Loan = props => {
   const isCreditor = authorities.find(a => a === AUTHORITIES.CREDITOR);
   const [state, setState] = useState({
     loading: false,
-    error: false,
     deal: defaultValue as IDeal
   });
 
@@ -45,8 +43,7 @@ export const Loan = props => {
     setState(old => ({
       ...old,
       deal: deal,
-      loading: false,
-      error: false
+      loading: false
     }));*/
 
     axios.get<IDeal>(`${DEALS_API}/${id}`).then(payload => {
@@ -54,11 +51,10 @@ export const Loan = props => {
         ...old,
         deal: payload.data,
         loading: false,
-        error: false
       }));
     }).catch(_ => {
-      setState(old => ({...old, loading: false, error: true}));
       message.error(t.dealFetchError, 6);
+      props.history.push('/loan');
     });
   }, []);
 
@@ -66,9 +62,50 @@ export const Loan = props => {
 
   if (state.deal.status === DealStatus.PENDING) {
     if (isCreditor) {
-      cardBottom = <div className="Margin-Top-Medium Text-Right"><Button type="danger">{t.remove}</Button></div>;
+
+      const handleDealDeletion = () => {
+        setState(old => ({...old, loading: true}));
+
+        const deal: IDeal = {};
+        deal.status = DealStatus.CLOSED;
+        deal.id = state.deal.id;
+
+        axios.put<IDeal>(DEALS_API, deal).then(_ => {
+          message.success(t.dealDeletionSuccess, 6);
+          props.history.push('/loan');
+        }).catch(_ => {
+          setState(old => ({...old, loading: false}));
+          message.error(t.dealDeletionFail, 6);
+        });
+      };
+
+      cardBottom = (
+        <div className="Margin-Top-Medium Text-Right">
+          <Button loading={state.loading} onClick={handleDealDeletion} type="danger">{t.remove}</Button>
+        </div>
+      );
     } else {
-      cardBottom = <div className="Margin-Top-Medium Text-Right"><Button type="primary">{t.takeLoan}</Button></div>;
+
+      const handleTakeDeal = () => {
+        setState(old => ({...old, loading: true}));
+
+        const deal: IDeal = {};
+        deal.id = state.deal.id;
+
+        axios.put<IDeal>(DEALS_API, deal).then(_ => {
+          message.success(t.loanTakenSuccess, 6);
+          props.history.push('/account');
+        }).catch(_ => {
+          message.error(t.loanTakeFail, 6);
+          props.history.push('/loan');
+        });
+      };
+
+      cardBottom = (
+        <div className="Margin-Top-Medium Text-Right">
+          <Button onClick={handleTakeDeal} loading={state.loading} type="primary">{t.takeLoan}</Button>
+        </div>
+      );
     }
   }
 
@@ -82,10 +119,6 @@ export const Loan = props => {
     return <Tag color={color}>{t.DealStatus[status]}</Tag>;
   };
 
-  if (state.error) {
-    return <Redirect to="/loan"/>;
-  }
-
   const profit = getExpectedProfitForDeal(state.deal);
   const successRate = getSuccessRateForDeal(state.deal);
 
@@ -95,28 +128,28 @@ export const Loan = props => {
         <Card title={t.loanDetails} style={{marginRight: '2%', width: '49%'}} extra={getTag()}>
           <div className="Row Between Wrap">
             <div className="Column">
-              { state.deal.dateOpen ?
+              {state.deal.dateOpen ?
                 <Statistic className="Height-Small" title={t.dateOpen} value={state.deal.dateOpen.calendar()}/> : null
               }
-              { state.deal.paymentEvery && state.deal.percent ?
+              {state.deal.paymentEvery && state.deal.percent ?
                 <Statistic className="Height-Small" title={t.rate} suffix={t.perTemporal(state.deal.paymentEvery)}
-                value={`${state.deal.percent}%`}/> : null
+                           value={`${state.deal.percent}%`}/> : null
               }
-              { state.deal.startBalance ?
+              {state.deal.startBalance ?
                 <Statistic className="Height-Small" title={t.amount} prefix="¢" value={state.deal.startBalance}/> : null
               }
-              { state.deal.dateBecomeActive ?
+              {state.deal.dateBecomeActive ?
                 <Statistic className="Height-Small" title={t.dateBecomeActive}
                            value={state.deal.dateBecomeActive.calendar()}/> : null
               }
             </div>
             <div className="Column">
-              { state.deal.paymentEvery ?
+              {state.deal.paymentEvery ?
                 <Statistic className="Height-Small" title={t.averagePayment} value={profit.averagePayment}
                            suffix={`¢ ${t.perTemporal(state.deal.paymentEvery)}`}/> : null
               }
               <Statistic className="Height-Small" title={t.successRate} value={successRate} suffix={`%`}/>
-              { state.deal.term && state.deal.paymentEvery ?
+              {state.deal.term && state.deal.paymentEvery ?
                 <Statistic className="Height-Small" title={t.term} value={state.deal.term}
                            suffix={`${t.temporal(state.deal.paymentEvery)}`}/> : null
               }
@@ -134,7 +167,8 @@ export const Loan = props => {
         </Card>
       </div>
 
-      <NumericLogCard/>
+      { state.deal.id ? <NumericLogCard location={props.location} dealId={state.deal.id}/> : null}
+
     </React.Fragment>
   );
 };

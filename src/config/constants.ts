@@ -24,5 +24,6 @@ export const ITEMS_PER_PAGE = 20;
 export const MIN_CREDIT_AMOUNT = 500;
 
 export const DEALS_API = 'api/deals';
+export const LOGS_API = 'api/balance-logs';
 
 export const ERROR_NO_MONEY = 'nomoney';
