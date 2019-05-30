@@ -1,17 +1,21 @@
-import React, {useContext} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {Card} from 'antd';
-import Button from 'antd/lib/button';
 import List from 'antd/lib/list';
 import Skeleton from 'antd/lib/skeleton';
 import Icon from 'antd/lib/icon';
 import Typography from 'antd/lib/typography';
 import {INotification} from "../../shared/model/notification.model";
 import {BalanceLogEvent} from "../../shared/model/balance-log-event";
-import moment from "moment";
 import {Notifications} from "../../shared/contexts/notification";
+import {getSortState} from "../../shared/util/pagination-utils";
+import {ITEMS_PER_PAGE} from "../../config/constants";
+import InfiniteScroll from 'react-infinite-scroller';
+import Empty from "antd/lib/empty";
+import {Translation} from "../../shared/contexts/translation";
 
 const ListItem = (item: INotification) => {
-  let text = 'Ant Design, a design language for background applications, is refined by Ant UED Team';
+  const t = useContext(Translation).translation;
+  const text = t.BalanceLogEvent[item.type as BalanceLogEvent];
   let icon;
 
   if (item.type === BalanceLogEvent.LOAN_TAKEN) {
@@ -21,9 +25,9 @@ const ListItem = (item: INotification) => {
   }
 
   return (
-    <List.Item actions={[<a>See problem</a>, <a>MArk as read</a>]}>
-      <Skeleton avatar title={false} loading={false} active>
-        <div className="notification-card__content">
+    <List.Item actions={[<a>{t.seeProblem}</a>, <a>{t.remove}</a>]}>
+      <Skeleton avatar title={false} active>
+        <div className="Row Centered">
           {icon}
           <Typography.Text type="secondary">{text}</Typography.Text>
         </div>
@@ -34,24 +38,41 @@ const ListItem = (item: INotification) => {
 
 const NotificationOverview = props => {
   const notifications = useContext(Notifications);
-  const notification: INotification = {};
-  notification.id = 1;
-  notification.date = moment();
-  notification.type = BalanceLogEvent.LOAN_TAKEN;
+  const [state, setState] = useState(getSortState(props.location, ITEMS_PER_PAGE));
+  const t = useContext(Translation).translation;
 
-  const notification2: INotification = {};
-  notification2.id = 2;
-  notification2.date = moment();
-  notification2.type = BalanceLogEvent.DEAL_CLOSED;
+  useEffect(() => {
+    notifications.fetchNotifications(state.activePage, state.itemsPerPage, `${state.sort},${state.order}`);
+  }, []);
 
-  const list = [notification, notification2];
+  const handleInfiniteOnLoad = () => {
+    setState(old => {
+      const newOne = {...old, activePage: old.activePage + 1};
+      notifications.fetchNotifications(newOne.activePage, newOne.itemsPerPage, `${newOne.sort},${newOne.order}`);
+      return newOne;
+    });
+  };
+
+  let body;
+
+  if (notifications.notifications.length > 0) {
+    body = (<List itemLayout="horizontal" dataSource={[...notifications.notifications]} renderItem={ListItem} />);
+  } else {
+    body = <Empty description={t.noItems} image={Empty.PRESENTED_IMAGE_SIMPLE}/>;
+  }
 
   return (
-    <Card>
-      <List itemLayout="horizontal" dataSource={list} renderItem={ListItem} />
-      <div style={{ marginTop: '1rem', textAlign: 'center' }}>
-        <Button>Load More</Button>
-      </div>
+    <Card title={t.notifications}>
+      <InfiniteScroll
+        pageStart={state.activePage}
+        loadMore={handleInfiniteOnLoad}
+        hasMore={state.activePage - 1 < notifications.links.next}
+        threshold={0}
+        initialLoad={true}
+        useWindow={true}
+      >
+        {body}
+      </InfiniteScroll>
     </Card>
   );
 };

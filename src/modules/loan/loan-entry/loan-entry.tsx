@@ -13,7 +13,7 @@ interface EntryProps {
 
 const LoanEntry = (props: EntryProps) => {
   const translation = useContext(Translation);
-  const t = translation.translation.LoanEntry;
+  const t = translation.translation;
   return (
     <div className="Row Between" onClick={props.clickHandler}>
       <Statistic title={t.rate} suffix={t.perTemporal(props.paymentEvery)} value={`${props.percent}%`} />

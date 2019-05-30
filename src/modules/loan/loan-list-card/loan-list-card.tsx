@@ -86,7 +86,7 @@ const LoanListCard = (props: LoanListCardProps) => {
       );
     });
   } else {
-    tabBody = <Empty description={t.noItems} image={Empty.PRESENTED_IMAGE_SIMPLE}/>;
+    tabBody = <Empty description={translation.translation.noItems} image={Empty.PRESENTED_IMAGE_SIMPLE}/>;
   }
 
   return (

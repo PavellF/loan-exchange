@@ -1,11 +1,13 @@
 import React, {useState} from 'react';
 import axios from "axios";
 import {INotification} from "../model/notification.model";
+import {parseHeaderForLinks} from "../util/url-utils";
 
 const initialState = {
   loading: false,
   notifications: [] as ReadonlyArray<INotification>,
   totalItems: 0,
+  links: {next: 0},
   errorMessage: null as unknown as string,
   fetchNotifications: (page?: number, size?: number, sort?: string) => {},
   fetchNotificationsCount: () => {},
@@ -24,9 +26,11 @@ const NotificationContext = (props) => {
     setState(oldState => Object.assign({}, oldState, {loading: true, errorMessage: null}));
 
     axios.get<INotification[]>(requestUrl).then(payload => {
+      const links = parseHeaderForLinks(payload.headers.link);
       setState(oldState => ({
         ...oldState,
         loading: false,
+        links,
         totalItems: payload.headers['x-total-count'],
         notifications: payload.data
       }));

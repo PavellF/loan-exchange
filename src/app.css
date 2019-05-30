@@ -37,6 +37,10 @@
   display: flex;
 }
 
+.Wrap {
+  flex-wrap: wrap;
+}
+
 .Around {
   justify-content: space-around;
 }
@@ -49,8 +53,16 @@
   width: 100%;
 }
 
+.Width-Half {
+  width: 50%;
+}
+
 .End {
   justify-content: flex-end;
+}
+
+.Align-Start {
+  align-items: flex-start;
 }
 
 .Margin-Top {
@@ -71,6 +83,10 @@
 
 .Height-Medium {
   min-height: 136px;
+}
+
+.Height-Small {
+  min-height: 70px;
 }
 
 .Text-Right {

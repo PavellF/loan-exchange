@@ -2,6 +2,53 @@ import React from 'react';
 import {PaymentInterval} from "../model/payment-interval";
 
 export default {
+  noItems: "Пусто",
+  seeProblem: "Перейти",
+  remove: "Удалить",
+  notifications: "Уведомления",
+  creditStatistic: "Статистика",
+  BalanceLogEvent: {
+    NEW_DEAL_OPEN: 'Открыт новый займ',
+    LOAN_TAKEN: 'Займ взят',
+    PERCENT_CHARGE: 'Начисление процента',
+    DEAL_PAYMENT: 'Платеж по займу',
+    DEAL_CLOSED: 'Займ закрыт'
+  },
+  dealFetchError: "Не удалось загрузить займ, попробуйте позже.",
+  takeLoan: "Взять",
+  amount: "Сумма",
+  revenue: "Прибыль",
+  rate: "Процент",
+  term: "Срок",
+  dateOpen: "Дата открытия",
+  dateBecomeActive: "Дата взятия",
+  loanDetails: "Параметры",
+  averagePayment: "Средний платеж",
+  successRate: "Вероятность успеха",
+  paymentsOverall: "Всего выплат",
+  difference: "Разница",
+  DealStatus: {
+    PENDING: 'В ожидании',
+    ACTIVE: 'Активно',
+    CLOSED: 'Закрыто',
+    SUCCESS: 'Погашено'
+  },
+  perTemporal: (unit: PaymentInterval): string => {
+    if (unit === PaymentInterval.MONTH) {
+      return "в месяц";
+    } else if (unit === PaymentInterval.DAY) {
+      return "в день";
+    } else {
+      return "за все время"
+    }
+  },
+  temporal: (unit: PaymentInterval): string => {
+    if (unit === PaymentInterval.MONTH) {
+      return "месяц";
+    } else {
+      return "день";
+    }
+  },
   LoanSearchForm: {
     search: "Поиск",
     creditAmount: "Сумма",
@@ -20,29 +67,6 @@ export default {
     activeTab: "Активные",
     pending: "В ожидании",
     all: "Все",
-    noItems: "Пусто"
-  },
-  LoanEntry: {
-    amount: "Сумма",
-    revenue: "Прибыль",
-    rate: "Процент",
-    term: "Срок",
-    perTemporal: (unit: PaymentInterval): string => {
-      if (unit === PaymentInterval.MONTH) {
-        return "в месяц";
-      } else if (unit === PaymentInterval.DAY) {
-        return "в день";
-      } else {
-        return "за все время"
-      }
-    },
-    temporal: (unit: PaymentInterval): string => {
-      if (unit === PaymentInterval.MONTH) {
-        return "месяц";
-      } else {
-        return "день";
-      }
-    },
   },
   CreateLoanSteps: {
     allowedToSpend: "Доступно для использования",

@@ -1,5 +1,6 @@
 import {PaymentInterval} from "../model/payment-interval";
 import {CREDIT_FEE_PERCENT, CREDIT_MIN_FEE} from "../../config/constants";
+import {IDeal} from "../model/deal.model";
 
 /**
  * Computes difference in relative unit.
@@ -13,7 +14,24 @@ export const percentageDifference = (beforeChange: number, afterChange: number):
   return ((afterChange - beforeChange) / beforeChange) * 100;
 };
 
-export const getExpectedProfit = (credit: number, rate: number, term: number, rateType: PaymentInterval) => {
+export interface IExpectedProfit {
+  profit: number,
+  fee: number,
+  averagePayment: number,
+  profitInPercent: number
+}
+
+export const getExpectedProfitForDeal = (deal: IDeal): IExpectedProfit => {
+  return getExpectedProfit(
+    deal.startBalance || 0,
+    deal.percent || 0,
+    deal.term || 0,
+    deal.paymentEvery || PaymentInterval.ONE_TIME
+  );
+};
+
+export const getExpectedProfit = (credit: number, rate: number,
+                                  term: number, rateType: PaymentInterval): IExpectedProfit => {
   if (rateType === undefined || rateType === PaymentInterval.ONE_TIME) {
     term = 1;
   }

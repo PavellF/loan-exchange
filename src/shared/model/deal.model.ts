@@ -12,7 +12,6 @@ export interface IDeal {
   percent?: number;
   successRate?: number;
   term?: number;
-  averagePayment?: number;
   paymentEvery?: PaymentInterval;
   status?: DealStatus;
   emitter?: IUser;
@@ -21,7 +20,15 @@ export interface IDeal {
 
 export const defaultValue: Readonly<IDeal> = {};
 
-export const getSuccessRate = (term: number, rate: number, rateType: PaymentInterval) => {
+export const getSuccessRateForDeal = (deal: IDeal): number => {
+  return getSuccessRate(
+    deal.term || 0,
+    deal.percent ||0,
+    deal.paymentEvery || PaymentInterval.ONE_TIME
+  );
+};
+
+export const getSuccessRate = (term: number, rate: number, rateType: PaymentInterval): number => {
   let successRate = 100;
 
   // bigger term - bigger successRate
@@ -42,3 +49,5 @@ export const getSuccessRate = (term: number, rate: number, rateType: PaymentInte
 
   return Math.max(Math.floor(successRate - rateAtomic * rate), 1);
 };
+
+
