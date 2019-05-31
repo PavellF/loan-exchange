@@ -204,7 +204,7 @@ const AuthFlow = (props: any) => {
               })(<Input size="large" type={'email'} placeholder="E-mail"/>)}
             </Form.Item>
             <p>{t.orLoginWith + ':'}</p>
-            <div className="brands">
+            <div className="Brands">
               <Button shape="circle" icon="facebook"/>
               <Button shape="circle" icon="instagram"/>
               <Button shape="circle" icon="google"/>
@@ -244,7 +244,7 @@ const AuthFlow = (props: any) => {
 
             <div className="Row Between">
               <a onClick={handlePasswordResetStart}>
-                Forgot password?
+                {t.forgotPassword}
               </a>
               <Button loading={auth.loading} type="primary" htmlType="submit">
                 {t.signIn}
@@ -421,7 +421,7 @@ const AuthFlow = (props: any) => {
               <Icon type="arrow-left"/>
             </a>
 
-            <div className="register-card__head">
+            <div className="Column">
               <BrandIcon/>
               <h1>{t.legalLabel}</h1>
             </div>

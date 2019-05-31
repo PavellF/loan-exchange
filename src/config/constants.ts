@@ -25,5 +25,7 @@ export const MIN_CREDIT_AMOUNT = 500;
 
 export const DEALS_API = 'api/deals';
 export const LOGS_API = 'api/balance-logs';
+export const STATS_API = 'api/account/stats';
+export const NOTIFICATIONS_API = 'api/notifications';
 
 export const ERROR_NO_MONEY = 'nomoney';

@@ -11,6 +11,7 @@ import {defaultValue, getSuccessRateForDeal, IDeal} from "../../../shared/model/
 import axios from "axios";
 import {DealStatus, getStatusColor} from "../../../shared/model/deal-status";
 import {getExpectedProfitForDeal} from "../../../shared/util/math-utils";
+import moment from "moment";
 
 export const Loan = props => {
   const t = useContext(Translation).translation;
@@ -129,7 +130,7 @@ export const Loan = props => {
           <div className="Row Between Wrap">
             <div className="Column">
               {state.deal.dateOpen ?
-                <Statistic className="Height-Small" title={t.dateOpen} value={state.deal.dateOpen.calendar()}/> : null
+                <Statistic className="Height-Small" title={t.dateOpen} value={moment(state.deal.dateOpen).calendar()}/> : null
               }
               {state.deal.paymentEvery && state.deal.percent ?
                 <Statistic className="Height-Small" title={t.rate} suffix={t.perTemporal(state.deal.paymentEvery)}
@@ -140,7 +141,7 @@ export const Loan = props => {
               }
               {state.deal.dateBecomeActive ?
                 <Statistic className="Height-Small" title={t.dateBecomeActive}
-                           value={state.deal.dateBecomeActive.calendar()}/> : null
+                           value={moment(state.deal.dateBecomeActive).calendar()}/> : null
               }
             </div>
             <div className="Column">

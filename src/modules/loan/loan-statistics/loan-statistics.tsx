@@ -42,7 +42,7 @@ const LoanStatistics = (props: LoanStatisticsProps) => {
   return (
     <React.Fragment>
       <Doughnut options={options} data={data} />
-      <div className="loan-statistics">
+      <div className="Row Between Wrap Margin-Top">
         <Statistic className="Width-Half Line-Centered" prefix="¢" title={t.paymentsOverall} value={props.profit} />
         <Statistic className="Width-Half Line-Centered" prefix="¢" title={t.difference}
                    value={props.profit - props.startBalance} />

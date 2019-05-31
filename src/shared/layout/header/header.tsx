@@ -39,7 +39,7 @@ export const AppHeader = (props) => {
   return (
     <React.Fragment>
       <Header style={{boxShadow: '2px 2px 3px rgba(0,0,0,.1)', background: 'white', zIndex: 1}}>
-        <div className="Container Header">
+        <div className="Container Row Between Wrap">
           <Brand/>
           <Menu mode="horizontal" defaultSelectedKeys={[startLinkActive]} style={{height: '65px', lineHeight: '64px'}}>
             <Menu.Item key={HeaderLink.DEALS}>

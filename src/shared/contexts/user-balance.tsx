@@ -5,6 +5,7 @@ import {IBalanceLog} from "../model/balance-log.model";
 
 const initialState = {
   balance: 0,
+  entry: {} as IBalanceLog,
   errorMessage: null as unknown as string,
   loading: false,
   update: () => {}
@@ -28,7 +29,13 @@ const UserBalanceContext = (props) => {
         newValue = Math.round(payload.data[0].amountChanged + payload.data[0].oldValue);
       }
 
-      setState(old => ({...old, loading: false, errorMessage: null as unknown as string, balance: newValue}));
+      setState(old => ({
+        ...old,
+        loading: false,
+        errorMessage: null as unknown as string,
+        balance: newValue,
+        entry: payload.data[0],
+      }));
 
     }).catch(error => {
       setState(old => ({...old, loading: false, errorMessage: error}));

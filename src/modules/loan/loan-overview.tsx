@@ -140,7 +140,7 @@ const LoanOverview = (props) => {
     topCard = (
       <div className="Margin-Bottom">
         <Card title={t.instantDeal}>
-          <div className="Row Around">
+          <div className="Row Around Wrap">
             <Card type="inner">
               <LoanSuggestion title={<>{t.deal} 1 <Icon type="dollar" theme="twoTone" /></>}
                               term={3} paymentEvery={PaymentInterval.MONTH} percent={9} onSuccess={onSuccessfulCreate}/>

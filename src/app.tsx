@@ -51,7 +51,7 @@ export const App = (props: any) => {
 
   if (!auth.sessionHasBeenFetched) {
     return (
-      <div className="page-loading">
+      <div className="Page-Loading">
         <Spin/>
       </div>
     );
@@ -62,7 +62,6 @@ export const App = (props: any) => {
     if (auth.account && auth.account.langKey) {
       translation.setLanguage(auth.account.langKey);
     }
-    {/*<AppHeader/>*/}
     pageBody = (
       <Layout>
         <Route component={AppHeader}/>
@@ -82,7 +81,7 @@ export const App = (props: any) => {
     pageBody = (
       <RegisterContext>
         <PasswordResetContext>
-          <div className="login-flow-container">
+          <div className="Login-Flow-Container">
             <Switch>
               <Route path="/auth" component={AuthFlow}/>
               <Redirect to="/auth"/>

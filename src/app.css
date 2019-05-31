@@ -1,8 +1,3 @@
-.row {
-  display: flex;
-  align-items: center;
-}
-
 .Fade-In {
   animation: fadeIn ease 1s;
 }
@@ -49,6 +44,10 @@
   justify-content: space-between;
 }
 
+.Evenly {
+  justify-content: space-evenly;
+}
+
 .Width-Full {
   width: 100%;
 }
@@ -93,70 +92,18 @@
   text-align: right;
 }
 
-.register-card__head {
-  display: flex;
-  flex-flow: column;
-}
-
-.register-card__row {
-  display: flex;
-  align-items: center;
-}
-
-.register-card__row > div {
-  margin-right: 20px;
-}
-
-.brands {
+.Brands {
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0.7rem 0;
 }
 
-.brands > button {
+.Brands > button {
   margin-right: 10px;
 }
 
-.status_red {
-  color: #f5222d;
-}
-
-.status_yellow {
-  color: #fadb14;
-}
-
-.status_green {
-  color: #52c41a;
-}
-
-
-
-.create-loan-actions {
-
-
-}
-
-.create-loan-active {
-  display: flex;
-  flex-flow: column;
-}
-
-.create-loan-summary {
-  width: 100%;
-  display: flex;
-  flex-flow: row;
-  justify-content: space-around;
-}
-
-.create-loan-summary__column {
-  display: flex;
-  justify-content: space-between;
-  height: 100%;
-  flex-flow: column;
-}
-
-.page-loading {
+.Page-Loading {
   height: 100vh;
   background: rgba(0, 0, 0, 0.05);
   display: flex;
@@ -164,7 +111,7 @@
   align-items: center;
 }
 
-.login-flow-container {
+.Login-Flow-Container {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -172,15 +119,10 @@
   flex-flow: column;
 }
 
-.fullscreen {
-  position: fixed;
-  top: 100px;
-  left: 0px;
-  width: 99% !important;
-  height: calc(100vh - 110px) !important;
-  margin: 5px;
-  z-index: 1000;
-  padding: 5px 25px 50px 25px !important;
+.Brand {
+  font-size: 1.5rem;
+  font-family: initial;
+  color: #030852;
 }
 
 /* ==========================================================================
@@ -195,80 +137,11 @@ Browser Upgrade Prompt
 }
 
 /* ==========================================================================
-Generic styles
-========================================================================== */
-
-/* Temporary workaround for availity-reactstrap-validation */
-.invalid-feedback {
-  display: inline;
-}
-
-/* other generic styles */
-
-.title {
-  font-size: 1.25em;
-  margin: 1px 10px 1px 10px;
-}
-
-.description {
-  font-size: 0.9em;
-  margin: 1px 10px 1px 10px;
-}
-
-.shadow {
-  box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px;
-  border-radius: 2px;
-}
-
-.error {
-  color: white;
-  background-color: red;
-}
-
-.break {
-  white-space: normal;
-  word-break: break-all;
-}
-
-.break-word {
-  white-space: normal;
-  word-break: keep-all;
-}
-
-.preserve-space {
-  white-space: pre-wrap;
-}
-
-.side-menu {
-  display: flex;
-  flex-flow: column;
-  align-items: flex-start;
-}
-
-
-/* ==========================================================================
-make sure browsers use the pointer cursor for anchors, even with no href
+Make sure browsers use the pointer cursor for anchors, even with no href
 ========================================================================== */
 
 a:hover {
   cursor: pointer;
-}
-
-.hand {
-  cursor: pointer;
-}
-
-button.anchor-btn {
-  background: none;
-  border: none;
-  padding: 0;
-  align-items: initial;
-  text-align: initial;
-  width: 100%;
-}
-
-a.anchor-btn:hover {
-  text-decoration: none;
 }
 
 /* ==========================================================================
@@ -280,158 +153,8 @@ Layout styles
   margin: auto;
 }
 
-.footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-top: 1px solid #e4e8ed;
-  padding: 24px 15px 35px;
-}
-
-/* ==========================================================================
-Metrics and Health styles
-========================================================================== */
-
-#threadDump .popover,
-#healthCheck .popover {
-  top: inherit;
-  display: block;
-  font-size: 10px;
-  max-width: 1024px;
-}
-
-.thread-dump-modal-lock {
-  max-width: 450px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-#healthCheck .popover {
-  margin-left: -50px;
-}
-
-.health-details {
-  min-width: 400px;
-}
-
-/* ==========================================================================
-Loan Entry styles
-========================================================================== */
-
-.loan-entry {
-  display: flex;
-  justify-content: space-between;
-}
-
-.loan-entry__left {
-  display: flex;
-  flex-flow: column;
-  flex-wrap: wrap;
-}
-
-.loan-entry__right {
-  display: flex;
-}
-
-.loan-entry__right > div {
-  margin-right: 1rem;
-}
-
-.loan-entry__entry {
-  display: block;
-  margin: 4px 0px;
-}
-
-/* ==========================================================================
-Loan Overview styles
-========================================================================== */
-
-.loan-overview {
-  display: flex;
-  flex-wrap: wrap;
-  margin-bottom: 24px;
-  align-items: flex-start;
-}
-
-.loan-overview__bottom {
-  margin: 0;
-  display: flex;
-}
-
-.loan-statistics {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  margin-top: 1.5rem;
-}
-
-.loan-statistics__entry {
-  text-align: center;
-  width: 50%;
-}
-
-.loan-details__card-row {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-}
-
-.loan-details__card-column {
-  display: flex;
-  flex-flow: column;
-  width: 50%;
-  justify-content: space-evenly;
-  align-items: center;
-}
-
-.loan-details__card-ceil {
-  text-align: center;
-}
-
-.loan-list__tab-body {
-  display: flex;
-  flex-flow: column;
-}
-
-.loan-list__tab-body-head {
-  margin-bottom: 24px;
-  align-self: center;
-}
-
-/* ==========================================================================
-Notifications page styles
-========================================================================== */
-
-.notification-card__content {
-  flex-grow: 1;
-  display: flex;
-  align-items: center;
-}
-
-/* ==========================================================================
-Account page styles
-========================================================================== */
-
-.account-overview {
-  display: flex;
-  justify-content: space-evenly;
-  padding: 1.5rem 0;
-}
-
-.Brand {
-  font-size: 1.5rem;
-  font-family: initial;
-  color: #030852;
-}
-
-.loading-bar {
-  height: 3px;
-  background-color: #2f54eb;
-  z-index: 1031;
-}
-
-.Header {
-  display: flex;
-  justify-content: space-between;
+@media (max-device-width: 1024px) {
+  .Container {
+    width: 100%;
+  }
 }

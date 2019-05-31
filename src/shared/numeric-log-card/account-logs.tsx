@@ -77,7 +77,7 @@ const NumericLogCard = ({location, dealId = null as unknown as number, userId = 
   const loadLogs = (urlParams: any) => {
 
     const params = Object.entries(urlParams).map(([key, value]) => {
-      if (value) {
+      if (value != null) {
         return `${key}=${value}`;
       }
     });
@@ -117,7 +117,7 @@ const NumericLogCard = ({location, dealId = null as unknown as number, userId = 
     setState(old => {
       const newState = {...old, activePage: old.activePage + 1};
       const params: any = {};
-      params.page = page !== undefined ? page : old.activePage;
+      params.page = page != null ? page : old.activePage;
       params.size = newState.itemsPerPage;
       params.sort = `${newState.sort},${newState.order}`;
       params.forDeal = dealId;

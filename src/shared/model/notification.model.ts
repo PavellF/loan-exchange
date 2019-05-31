@@ -1,13 +1,11 @@
 import {Moment} from 'moment';
 import {BalanceLogEvent} from "./balance-log-event";
-import {IUser} from "./user.model";
 
 export interface INotification {
   id?: number;
   date?: Moment;
   type?: BalanceLogEvent;
-  recipient?: IUser;
-  associatedDeal?: number;
+  associatedDealId?: number;
 }
 
 export const defaultValue: Readonly<INotification> = {};
