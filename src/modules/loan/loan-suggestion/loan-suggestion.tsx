@@ -25,7 +25,7 @@ const LoanSuggestion = (props: LoanSuggestionProps) => {
   const balance = useContext(UserBalance);
   const translation = useContext(Translation);
   const [loading, setLoading] = useState(false);
-  const startBalance = Math.max(500, Math.round(balance.balance * 0.00033));
+  const startBalance = Math.max(500, Math.round(balance.balance * 0.33));
   const t = translation.translation.CreateLoanSteps;
   const {percent, term, paymentEvery} = props;
   const firstProfit = getExpectedProfit(startBalance, percent, term, paymentEvery);
@@ -34,10 +34,18 @@ const LoanSuggestion = (props: LoanSuggestionProps) => {
     setLoading(true);
     const deal: IDeal = {percent, term, paymentEvery, startBalance};
 
+    if (paymentEvery === PaymentInterval.MONTH) {
+      deal.term = Math.round(term / 30);
+    }
+
     axios.post(DEALS_API, deal).then(payload => {
       const id = payload.data.id;
-      if (props.onSuccess) props.onSuccess(id);
-      setLoading(false);
+
+      if (props.onSuccess) {
+        props.onSuccess(id);
+      } else {
+        setLoading(false);
+      }
     }).catch(error => {
       setLoading(false);
       if (error.response.data.errorKey === ERROR_NO_MONEY) {
@@ -52,7 +60,7 @@ const LoanSuggestion = (props: LoanSuggestionProps) => {
     <div style={{minHeight: 350, minWidth: 200}} className="Column Between">
       <Title level={3}>{props.title}</Title>
       <Statistic title={t.rate} value={percent} suffix={`% ${t.perTemporal(paymentEvery)}`}/>
-      <Statistic title={t.term} value={term} suffix={`${t.temporal(paymentEvery)}`}/>
+      <Statistic title={t.term} value={term} suffix={translation.translation.day}/>
       <Statistic
         title={t.revenue}
         value={`${firstProfit.profit}¢`}

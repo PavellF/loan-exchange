@@ -20,7 +20,7 @@ const LoanEntry = (props: EntryProps) => {
 
       <div style={{flexGrow: 0.1}} className="Row Between">
         <Statistic title={t.amount} prefix="¢" value={props.startBalance} />
-        <Statistic title={t.term} value={props.term} suffix={t.temporal(props.paymentEvery)}/>
+        <Statistic title={t.term} value={props.term} suffix={t.day}/>
       </div>
     </div>
   );

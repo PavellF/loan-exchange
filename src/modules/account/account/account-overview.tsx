@@ -5,11 +5,10 @@ import {Authentication} from "../../../shared/contexts/authentication";
 import axios from "axios";
 import {IAccountStats} from "../../../shared/model/account-stats.model";
 import {STATS_API} from "../../../config/constants";
-import {UserBalance} from "../../../shared/contexts/user-balance";
 
 const AccountOverview = props => {
   const auth = useContext(Authentication);
-  const balance = useContext(UserBalance);
+
   const [state, setState] = useState({
     stats: {
       allTimeIncoming: 0,
@@ -30,7 +29,7 @@ const AccountOverview = props => {
 
   return (
     <div>
-      <Overview currentBalance={balance.entry} stats={state.stats} user={auth.account}/>
+      <Overview stats={state.stats} user={auth.account}/>
       <div className="Margin-Top">
         <NumericLogCard location={props.location} userId={auth.account.id}/>
       </div>

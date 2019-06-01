@@ -34,6 +34,8 @@ export const getExpectedProfit = (credit: number, rate: number,
                                   term: number, rateType: PaymentInterval): IExpectedProfit => {
   if (rateType === undefined || rateType === PaymentInterval.ONE_TIME) {
     term = 1;
+  } else if (rateType === PaymentInterval.MONTH) {
+    term = Math.round(term / 30);
   }
 
   const overhead = term * (credit * (rate / 100));

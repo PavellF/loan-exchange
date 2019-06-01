@@ -67,9 +67,8 @@ export const Loan = props => {
       const handleDealDeletion = () => {
         setState(old => ({...old, loading: true}));
 
-        const deal: IDeal = {};
+        const deal: IDeal = state.deal;
         deal.status = DealStatus.CLOSED;
-        deal.id = state.deal.id;
 
         axios.put<IDeal>(DEALS_API, deal).then(_ => {
           message.success(t.dealDeletionSuccess, 6);
@@ -90,10 +89,7 @@ export const Loan = props => {
       const handleTakeDeal = () => {
         setState(old => ({...old, loading: true}));
 
-        const deal: IDeal = {};
-        deal.id = state.deal.id;
-
-        axios.put<IDeal>(DEALS_API, deal).then(_ => {
+        axios.put<IDeal>(DEALS_API, state.deal).then(_ => {
           message.success(t.loanTakenSuccess, 6);
           props.history.push('/account');
         }).catch(_ => {
@@ -152,7 +148,7 @@ export const Loan = props => {
               <Statistic className="Height-Small" title={t.successRate} value={successRate} suffix={`%`}/>
               {state.deal.term && state.deal.paymentEvery ?
                 <Statistic className="Height-Small" title={t.term} value={state.deal.term}
-                           suffix={`${t.temporal(state.deal.paymentEvery)}`}/> : null
+                           suffix={t.day}/> : null
               }
             </div>
           </div>

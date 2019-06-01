@@ -54,7 +54,9 @@ const AuthenticationContext = (props) => {
     }).catch(error => {
       setAuth(oldState => Object.assign({}, oldState, {
         errorMessage: error,
-        loginError: true
+        loginError: true,
+        loading: false,
+        loginSuccess: false
       }));
     });
   };

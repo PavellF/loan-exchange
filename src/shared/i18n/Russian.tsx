@@ -22,6 +22,7 @@ export default {
   overallIncoming: "Всего поступлений",
   loanPayments: "Платежи по займам",
   year: "Год",
+  day: "день",
   thirtyDays: "30 дней",
   LogsTab: {
     LOGS: "История",
@@ -48,6 +49,7 @@ export default {
   successRate: "Вероятность успеха",
   paymentsOverall: "Всего выплат",
   difference: "Разница",
+  search: "Поиск",
   DealStatus: {
     PENDING: 'В ожидании',
     ACTIVE: 'Активно',
@@ -69,11 +71,6 @@ export default {
     } else {
       return "день";
     }
-  },
-  LoanSearchForm: {
-    search: "Поиск",
-    creditAmount: "Сумма",
-    whenCanReturn: "Могу отдать"
   },
   LoanOverview: {
     dealsFetchError: "Не удалось загрузить сделки, попробуйте позже.",

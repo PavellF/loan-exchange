@@ -12,7 +12,6 @@ import {DealStatus} from "../../shared/model/deal-status";
 import {parseHeaderForLinks} from "../../shared/util/url-utils";
 import {loadMoreDataWhenScrolled} from "../../shared/util/entity-utils";
 import {getSortState} from "../../shared/util/pagination-utils";
-import {Moment} from "moment";
 import Typography from "antd/lib/typography";
 import Button from "antd/lib/button";
 import LoanSuggestion from "./loan-suggestion/loan-suggestion";
@@ -26,7 +25,7 @@ const dealState = {
   links: {next: 0},
   totalItems: 0,
   currentTab: Tabs.ACTIVE,
-  endDateIntervalStart: 0,
+  minTerm: 0,
   withStartBalance: 0
 };
 
@@ -61,11 +60,11 @@ const LoanOverview = (props) => {
     });
   };
 
-  const searchDeals = (amount: number, minDays: Moment) => {
+  const searchDeals = (amount: number, minDays: number) => {
     setDeals(old => {
       const newState = {
         ...old,
-        endDateIntervalStart: minDays.unix(),
+        minTerm: minDays,
         withStartBalance: amount,
         currentTab: Tabs.SEARCH,
         sort: 'successRate',
@@ -85,7 +84,9 @@ const LoanOverview = (props) => {
         sort: 'id',
         order: 'DESC'
       };
-      loadDeals(getUrl(newState), false);
+      if (currentTab !== Tabs.SEARCH) {
+        loadDeals(getUrl(newState), false);
+      }
       return newState;
     });
   };
@@ -99,7 +100,7 @@ const LoanOverview = (props) => {
   };
 
   const getUrl = (state): string => {
-    const {activePage, itemsPerPage, sort, order, currentTab, endDateIntervalStart, withStartBalance} = state;
+    const {activePage, itemsPerPage, sort, order, currentTab, minTerm, withStartBalance} = state;
     const params: string[] = [];
     params.push(`page=${activePage - 1}`);
     params.push(`size=${itemsPerPage}`);
@@ -112,7 +113,7 @@ const LoanOverview = (props) => {
     }
 
     if (currentTab === Tabs.SEARCH) {
-      params.push(`endDateIntervalStart=${endDateIntervalStart}`);
+      params.push(`minTerm=${minTerm}`);
       params.push(`withStartBalance=${withStartBalance}`);
     }
 
@@ -143,7 +144,7 @@ const LoanOverview = (props) => {
           <div className="Row Around Wrap">
             <Card type="inner">
               <LoanSuggestion title={<>{t.deal} 1 <Icon type="dollar" theme="twoTone" /></>}
-                              term={3} paymentEvery={PaymentInterval.MONTH} percent={9} onSuccess={onSuccessfulCreate}/>
+                              term={90} paymentEvery={PaymentInterval.MONTH} percent={9} onSuccess={onSuccessfulCreate}/>
             </Card>
             <Card type="inner">
               <LoanSuggestion title={<>{t.deal} 2 <Icon type="dollar" theme="twoTone" /></>}
@@ -151,7 +152,7 @@ const LoanOverview = (props) => {
             </Card>
             <Card type="inner">
               <LoanSuggestion title={<>{t.deal} 3 <Icon type="dollar" theme="twoTone" /></>}
-                              term={90} paymentEvery={PaymentInterval.ONE_TIME} percent={25} onSuccess={onSuccessfulCreate}/>
+                              term={180} paymentEvery={PaymentInterval.ONE_TIME} percent={25} onSuccess={onSuccessfulCreate}/>
             </Card>
           </div>
           <div className="Line-Centered Margin-Top">

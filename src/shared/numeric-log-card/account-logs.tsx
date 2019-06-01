@@ -21,16 +21,22 @@ export enum LogsTab {
   GRAPH = 'GRAPH'
 }
 
-const getPercentageDifference = percent =>
-  percent > 0 ? (
-    <Statistic value={Math.abs(percent)} precision={2} valueStyle={{color: '#3f8600'}}
-               prefix={<Icon type="arrow-up"/>} suffix="%"/>
-  ) : (
-    <Statistic value={Math.abs(percent)} precision={2} valueStyle={{color: '#cf1322'}}
-               prefix={<Icon type="arrow-down"/>} suffix="%"/>
-  );
+const getPercentageDifference = percent => {
+  if (isFinite(percent)) {
+    return percent > 0 ? (
+      <Statistic value={Math.abs(percent)} precision={2} valueStyle={{ color: '#3f8600' }}
+        prefix={<Icon type="arrow-up" />} suffix="%" />
+    ) : (
+        <Statistic value={Math.abs(percent)} precision={2} valueStyle={{ color: '#cf1322' }}
+          prefix={<Icon type="arrow-down" />} suffix="%" />
+      );
+  } else {
+    return null;
+  }
+}
 
-const NumericLogCard = ({location, dealId = null as unknown as number, userId = null as unknown as number}) => {
+
+const NumericLogCard = ({ location, dealId = null as unknown as number, userId = null as unknown as number }) => {
   const t = useContext(Translation).translation;
 
   const tabList = [
@@ -50,11 +56,11 @@ const NumericLogCard = ({location, dealId = null as unknown as number, userId = 
 
     return (
       <List.Item key={item.id} className="Row Between">
-        <Statistic title={t.BalanceLogEvent[item.type]} value={moment(item.date).calendar()}/>
+        <Statistic title={t.BalanceLogEvent[item.type]} value={moment(item.date).calendar()} />
         <div className="Row Between">
-          <Statistic title={t.balance} value={newValue} prefix={'¢'} suffix={getPercentageDifference(percentageChange)}/>
-          <Statistic style={{marginLeft: '1rem'}} title={t.change} value={item.amountChanged} prefix={'¢'}
-                     valueStyle={{color: item.amountChanged < 0 ? '#cf1322' : '#3f8600'}}
+          <Statistic title={t.balance} value={newValue} prefix={'¢'} suffix={getPercentageDifference(percentageChange)} />
+          <Statistic style={{ marginLeft: '1rem' }} title={t.change} value={item.amountChanged} prefix={'¢'}
+            valueStyle={{ color: item.amountChanged < 0 ? '#cf1322' : '#3f8600' }}
           />
         </div>
       </List.Item>
@@ -63,7 +69,7 @@ const NumericLogCard = ({location, dealId = null as unknown as number, userId = 
 
   const [state, setState] = useState({
     logs: [] as ReadonlyArray<IBalanceLog>,
-    links: {next: 0},
+    links: { next: 0 },
     totalItems: 0,
     currentTab: LogsTab.LOGS,
     error: false,
@@ -96,7 +102,7 @@ const NumericLogCard = ({location, dealId = null as unknown as number, userId = 
       }));
       dismiss();
     }).catch(error => {
-      setState(old => ({...old, error: true}));
+      setState(old => ({ ...old, error: true }));
       dismiss();
       message.error(t.logsLoadFail, 5);
     });
@@ -104,7 +110,7 @@ const NumericLogCard = ({location, dealId = null as unknown as number, userId = 
   };
 
   const handleTabChange = (key: string) => {
-    setState(old => ({...old, currentTab: key as LogsTab}));
+    setState(old => ({ ...old, currentTab: key as LogsTab }));
   };
 
   const handlePeriodChange = (startDaysAgo?: number) => {
@@ -115,7 +121,7 @@ const NumericLogCard = ({location, dealId = null as unknown as number, userId = 
 
   const handleInfiniteOnLoad = (page?: number) => {
     setState(old => {
-      const newState = {...old, activePage: old.activePage + 1};
+      const newState = { ...old, activePage: old.activePage + 1 };
       const params: any = {};
       params.page = page != null ? page : old.activePage;
       params.size = newState.itemsPerPage;
@@ -132,7 +138,7 @@ const NumericLogCard = ({location, dealId = null as unknown as number, userId = 
   if (state.currentTab === LogsTab.LOGS) {
 
     if (state.logs.length === 0 || state.error) {
-      content = <Empty description={t.noItems} image={Empty.PRESENTED_IMAGE_SIMPLE}/>;
+      content = <Empty description={t.noItems} image={Empty.PRESENTED_IMAGE_SIMPLE} />;
     } else {
       content = (
         <InfiniteScroll
@@ -143,12 +149,12 @@ const NumericLogCard = ({location, dealId = null as unknown as number, userId = 
           initialLoad={false}
           useWindow={false}
         >
-          <List size="large" bordered dataSource={[...state.logs]} renderItem={NumericLog}/>
+          <List size="large" bordered dataSource={[...state.logs]} renderItem={NumericLog} />
         </InfiniteScroll>
       );
     }
   } else {
-    content = <NumericLogGraph logs={state.logs} onPeriodChange={handlePeriodChange}/>;
+    content = <NumericLogGraph logs={state.logs} onPeriodChange={handlePeriodChange} />;
   }
 
   return (

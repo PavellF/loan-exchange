@@ -5,8 +5,9 @@ import {IBalanceLog} from "../model/balance-log.model";
 
 const initialState = {
   balance: 0,
-  entry: {} as IBalanceLog,
-  errorMessage: null as unknown as string,
+  amountChanged: 0,
+  oldValue: 0,
+  error: false,
   loading: false,
   update: () => {}
 };
@@ -23,22 +24,22 @@ const UserBalanceContext = (props) => {
     setState(old => Object.assign({}, old, {loading: true}));
 
     axios.get<IBalanceLog[]>(requestUrl).then(payload => {
-      let newValue = state.balance;
 
       if (payload.data.length === 1) {
-        newValue = Math.round(payload.data[0].amountChanged + payload.data[0].oldValue);
+        setState(old => ({
+          ...old,
+          loading: false,
+          errorMessage: null as unknown as string,
+          balance: payload.data[0].oldValue + payload.data[0].amountChanged,
+          amountChanged: payload.data[0].amountChanged,
+          oldValue: payload.data[0].oldValue,
+        }));
+      } else {
+        setState(initialState);
       }
 
-      setState(old => ({
-        ...old,
-        loading: false,
-        errorMessage: null as unknown as string,
-        balance: newValue,
-        entry: payload.data[0],
-      }));
-
     }).catch(error => {
-      setState(old => ({...old, loading: false, errorMessage: error}));
+      setState(old => ({...old, loading: false, error: true}));
     });
   };
 

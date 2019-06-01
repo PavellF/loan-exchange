@@ -1,5 +1,6 @@
 import React, {useContext} from 'react';
 import {languages, Translation} from "../../contexts/translation";
+import {Button} from 'antd';
 
 const LocaleMenu = ({maxInline = 0}) => {
 
@@ -12,9 +13,9 @@ const LocaleMenu = ({maxInline = 0}) => {
 
   if (languages.length > maxInline) {
     modal = (
-      <a onClick={() => {}}>
+      <Button type="link" onClick={() => {}}>
         {translation.translation.LocaleMenu.allLanguages}
-      </a>
+      </Button>
     );
   }
 
@@ -22,7 +23,7 @@ const LocaleMenu = ({maxInline = 0}) => {
     <div>
       {translation.translation.LocaleMenu.language + ': '}
       {cropped.map(locale => (
-        <a key={locale.locale} onClick={() => translation.setLanguage(locale.locale)}>{`${locale.name} `}</a>
+        <Button style={{padding: 3}} type="link" key={locale.locale} onClick={() => translation.setLanguage(locale.locale)}>{`${locale.name} `}</Button>
       ))}
       {modal}
     </div>

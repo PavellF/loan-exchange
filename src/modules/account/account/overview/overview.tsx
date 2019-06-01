@@ -4,21 +4,20 @@ import Tag from 'antd/lib/tag';
 import React, {useContext} from 'react';
 import Icon from 'antd/lib/icon';
 import {IAccountStats} from "../../../../shared/model/account-stats.model";
-import {IBalanceLog} from "../../../../shared/model/balance-log.model";
 import {IUser} from "../../../../shared/model/user.model";
 import {Translation} from "../../../../shared/contexts/translation";
 import {percentageDifference} from "../../../../shared/util/math-utils";
+import {UserBalance} from "../../../../shared/contexts/user-balance";
 
 interface OverviewProps {
   stats: IAccountStats;
-  currentBalance: IBalanceLog;
   user: IUser;
 }
 
 const Overview = (props: OverviewProps) => {
   const t = useContext(Translation).translation;
-  const balance = props.currentBalance.amountChanged + props.currentBalance.oldValue;
-  const percentChange = percentageDifference(props.currentBalance.oldValue, balance);
+  const balance = useContext(UserBalance);
+  const percentChange = percentageDifference(balance.oldValue, balance.balance);
 
   return (
     <PageHeader
@@ -31,11 +30,11 @@ const Overview = (props: OverviewProps) => {
       ]}>
       <div className="Row Evenly Margin-Top Margin-Bottom">
         <Statistic
-          valueStyle={{fontSize: '2.2rem', color: balance < 0 ? '#cf1322' : 'inherit'}}
+          valueStyle={{fontSize: '2.2rem', color: balance.balance < 0 ? '#cf1322' : 'inherit'}}
           title={t.balance}
           prefix="¢"
-          value={balance}
-          suffix={percentChange !== 0 ?
+          value={balance.balance}
+          suffix={percentChange !== 0 && !isNaN(percentChange) ?
             <Statistic
               value={percentChange}
               precision={2}

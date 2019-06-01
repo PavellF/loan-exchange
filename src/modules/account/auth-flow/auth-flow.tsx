@@ -41,8 +41,8 @@ const reducer = (currentState, action) => {
 };
 
 const AuthFlow = (props: any) => {
-  const {getFieldDecorator, validateFields, getFieldValue} = props.form;
-  const {location} = props;
+  const { getFieldDecorator, validateFields, getFieldValue } = props.form;
+  const { location } = props;
   const auth = useContext(Authentication);
   const register = useContext(Register);
   const resetPassword = useContext(PasswordReset);
@@ -56,7 +56,7 @@ const AuthFlow = (props: any) => {
   const resetKey = getUrlParameter('key', props.location.search);
 
   useEffect(() => {
-    const {from} = location.state || {from: {pathname: '/', search: location.search}};
+    const { from } = location.state || { from: { pathname: '/', search: location.search } };
 
     if (auth.isAuthenticated) {
       props.history.push(from);
@@ -75,26 +75,35 @@ const AuthFlow = (props: any) => {
     }
   }, [register.registrationSuccess]);
 
-  if (register.registrationFailure) {
-    message.error(t.registrationFailure);
-  }
-
-  if (resetPassword.resetPasswordSuccess) {
-    message.success(t.resetPasswordSuccess);
-    if (resetKey) {
-      dispatch({type: GO_FORWARD, payload: ENTER_EMAIL});
-    } else {
-      dispatch({type: GO_FORWARD, payload: RESET_PASSWORD});
+  useEffect(() => {
+    if (register.registrationFailure) {
+      message.error(t.registrationFailure);
     }
-  }
+  }, [register.registrationFailure]);
 
-  if (resetPassword.resetPasswordFailure) {
-    message.error(t.resetPasswordFailure);
-  }
+  useEffect(() => {
+    if (resetPassword.resetPasswordSuccess) {
+      message.success(t.resetPasswordSuccess);
+      if (resetKey) {
+        dispatch({ type: GO_FORWARD, payload: ENTER_EMAIL });
+      } else {
+        dispatch({ type: GO_FORWARD, payload: RESET_PASSWORD });
+      }
+    }
+  }, [resetPassword.resetPasswordSuccess]);
 
-  if (auth.loginError) {
-    message.error(t.loginError);
-  }
+  useEffect(() => {
+    if (resetPassword.resetPasswordFailure) {
+      message.error(t.resetPasswordFailure);
+    }
+  }, [resetPassword.resetPasswordFailure]);
+
+  useEffect(() => {
+    
+    if (auth.loginError) {
+      message.error(t.loginError);
+    }
+  }, [auth.loginError]);
 
   if (resetKey) {
     stack.push(RESET_PASSWORD);
@@ -157,7 +166,7 @@ const AuthFlow = (props: any) => {
   const validateToNextPassword = (rule, value, callback) => {
     const form = props.form;
     if (value && confirmDirty) {
-      form.validateFields(['confirm'], {force: true});
+      form.validateFields(['confirm'], { force: true });
     }
     callback();
   };
@@ -175,7 +184,7 @@ const AuthFlow = (props: any) => {
   };
 
   const validateAndGoForward = (fieldsToValidate: string[], to: string) => {
-    validateFields(fieldsToValidate).then(_ => dispatch({type: GO_FORWARD, payload: to}));
+    validateFields(fieldsToValidate).then(_ => dispatch({ type: GO_FORWARD, payload: to }));
   };
 
   const handleConfirmBlur = e => {
@@ -185,12 +194,12 @@ const AuthFlow = (props: any) => {
 
   if (flowStack[flowStack.length - 1] === ENTER_EMAIL || flowStack[flowStack.length - 1] === ENTER_PASSWORD) {
     return (
-      <Card style={{width: 400}}>
+      <Card style={{ width: 400 }}>
         <Form onSubmit={handleLogin}>
           <div className={flowStack[flowStack.length - 1] === ENTER_EMAIL ? 'Fade-In' : 'Hidden'}>
 
             <div className="Column Centered">
-              <BrandIcon/>
+              <BrandIcon />
               <h1>{t.signIn}</h1>
               <p>{t.usingAccount}</p>
             </div>
@@ -198,20 +207,20 @@ const AuthFlow = (props: any) => {
             <Form.Item>
               {getFieldDecorator('email', {
                 rules: [
-                  {required: true, message: t.emailRequired},
-                  {type: 'email', message: t.emailPattern}
+                  { required: true, message: t.emailRequired },
+                  { type: 'email', message: t.emailPattern }
                 ]
-              })(<Input size="large" type={'email'} placeholder="E-mail"/>)}
+              })(<Input size="large" type={'email'} placeholder="E-mail" />)}
             </Form.Item>
             <p>{t.orLoginWith + ':'}</p>
             <div className="Brands">
-              <Button shape="circle" icon="facebook"/>
-              <Button shape="circle" icon="instagram"/>
-              <Button shape="circle" icon="google"/>
+              <Button shape="circle" icon="facebook" />
+              <Button shape="circle" icon="instagram" />
+              <Button shape="circle" icon="google" />
             </div>
 
             <div className="Row Between">
-              <a onClick={() => dispatch({type: GO_FORWARD, payload: SELECT_ROLE})}>
+              <a onClick={() => dispatch({ type: GO_FORWARD, payload: SELECT_ROLE })}>
                 {t.createAccount}
               </a>
               <Button type="primary" onClick={() => validateAndGoForward(['email'], ENTER_PASSWORD)}>
@@ -221,25 +230,25 @@ const AuthFlow = (props: any) => {
           </div>
 
           <div className={flowStack[flowStack.length - 1] === ENTER_PASSWORD ? 'Fade-In' : 'Hidden'}>
-            <a onClick={() => dispatch({type: GO_BACK})}>
-              <Icon type="arrow-left"/>
+            <a onClick={() => dispatch({ type: GO_BACK })}>
+              <Icon type="arrow-left" />
             </a>
 
             <div className="Column Centered">
-              <BrandIcon/>
+              <BrandIcon />
               <h1>{t.welcome}</h1>
-              <p><Icon type="user"/> {getFieldValue('email')}</p>
+              <p><Icon type="user" /> {getFieldValue('email')}</p>
             </div>
 
             <Form.Item>
               {getFieldDecorator('password', {
                 rules: [
-                  {required: true, message: t.passwordRequired},
-                  {validator: null},
-                  {min: 6, message: t.passwordMin(6)},
-                  {max: 64, message: t.passwordMax(64)}
+                  { required: true, message: t.passwordRequired },
+                  { validator: null },
+                  { min: 6, message: t.passwordMin(6) },
+                  { max: 64, message: t.passwordMax(64) }
                 ]
-              })(<Input.Password size="large" placeholder={t.passwordPlaceholder}/>)}
+              })(<Input.Password size="large" placeholder={t.passwordPlaceholder} />)}
             </Form.Item>
 
             <div className="Row Between">
@@ -261,40 +270,40 @@ const AuthFlow = (props: any) => {
     flowStack[flowStack.length - 1] === LEGAL
   ) {
     return (
-      <Card style={{maxWidth: 450}}>
+      <Card style={{ maxWidth: 450 }}>
         <Form onSubmit={handleSignUp}>
           <div className={flowStack[flowStack.length - 1] === SELECT_ROLE ? 'Fade-In' : 'Hidden'}>
-            <a onClick={() => dispatch({type: GO_BACK})}>
-              <Icon type="arrow-left"/>
+            <a onClick={() => dispatch({ type: GO_BACK })}>
+              <Icon type="arrow-left" />
             </a>
 
             <div className="Column Centered">
-              <BrandIcon/>
+              <BrandIcon />
               <h1>{t.selectRole}</h1>
             </div>
 
             <Button size="large" block onClick={() => validateAndGoForward([], CREATE_CREDITOR_ACCOUNT)}>
               {t.creditor}
-              <Icon type="right"/>
+              <Icon type="right" />
             </Button>
             <p>{t.creditorDesc}</p>
             <Button size="large" block onClick={() => validateAndGoForward([], CREATE_DEBTOR_ACCOUNT)}>
               {t.debtor}
-              <Icon type="right"/>
+              <Icon type="right" />
             </Button>
             <p>{t.debtorDesc}</p>
           </div>
 
           <div className={
             flowStack[flowStack.length - 1] === CREATE_DEBTOR_ACCOUNT
-            || flowStack[flowStack.length - 1] === CREATE_CREDITOR_ACCOUNT ? 'Fade-In' : 'Hidden'
+              || flowStack[flowStack.length - 1] === CREATE_CREDITOR_ACCOUNT ? 'Fade-In' : 'Hidden'
           }>
-            <a onClick={() => dispatch({type: GO_BACK})}>
-              <Icon type="arrow-left"/>
+            <a onClick={() => dispatch({ type: GO_BACK })}>
+              <Icon type="arrow-left" />
             </a>
 
             <div className="Column">
-              <BrandIcon/>
+              <BrandIcon />
               <h1>{t.createAccountLabel}</h1>
             </div>
 
@@ -303,22 +312,22 @@ const AuthFlow = (props: any) => {
                 <Form.Item label={t.firstName}>
                   {getFieldDecorator('firstName', {
                     rules: [
-                      {required: true, message: t.firstNameRequired},
-                      {min: 1, message: t.firstNameMin(1)},
-                      {max: 64, message: t.firstNameMax(64)}
+                      { required: true, message: t.firstNameRequired },
+                      { min: 1, message: t.firstNameMin(1) },
+                      { max: 64, message: t.firstNameMax(64) }
                     ]
-                  })(<Input type={'text'} placeholder={t.firstName}/>)}
+                  })(<Input type={'text'} placeholder={t.firstName} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label={t.lastName}>
                   {getFieldDecorator('lastName', {
                     rules: [
-                      {required: true, message: t.lastNameRequired},
-                      {min: 1, message: t.lastNameMin(1)},
-                      {max: 64, message: t.lastNameMax(64)}
+                      { required: true, message: t.lastNameRequired },
+                      { min: 1, message: t.lastNameMin(1) },
+                      { max: 64, message: t.lastNameMax(64) }
                     ]
-                  })(<Input type={'text'} placeholder={t.lastName}/>)}
+                  })(<Input type={'text'} placeholder={t.lastName} />)}
                 </Form.Item>
               </Col>
             </Row>
@@ -326,10 +335,10 @@ const AuthFlow = (props: any) => {
             <Form.Item label={t.email}>
               {getFieldDecorator('email', {
                 rules: [
-                  {required: true, message: t.emailRequired},
-                  {type: 'email', message: t.emailPattern}
+                  { required: true, message: t.emailRequired },
+                  { type: 'email', message: t.emailPattern }
                 ]
-              })(<Input type={'email'} placeholder="E-mail"/>)}
+              })(<Input type={'email'} placeholder="E-mail" />)}
             </Form.Item>
 
             <Row gutter={16}>
@@ -337,12 +346,12 @@ const AuthFlow = (props: any) => {
                 <Form.Item label={t.passwordPlaceholder}>
                   {getFieldDecorator('password', {
                     rules: [
-                      {required: true, message: t.passwordRequired},
-                      {validator: validateToNextPassword},
-                      {min: 6, message: t.passwordMin(6)},
-                      {max: 64, message: t.passwordMax(64)}
+                      { required: true, message: t.passwordRequired },
+                      { validator: validateToNextPassword },
+                      { min: 6, message: t.passwordMin(6) },
+                      { max: 64, message: t.passwordMax(64) }
                     ]
-                  })(<Input type={showPassword ? 'text' : 'password'} placeholder={t.passwordPlaceholder}/>)}
+                  })(<Input type={showPassword ? 'text' : 'password'} placeholder={t.passwordPlaceholder} />)}
                 </Form.Item>
               </Col>
 
@@ -350,10 +359,10 @@ const AuthFlow = (props: any) => {
                 <Form.Item label={t.confirmPassword}>
                   {getFieldDecorator('confirm', {
                     rules: [
-                      {required: true, message: t.passwordRequired},
-                      {validator: compareToFirstPassword},
-                      {min: 6, message: t.passwordMin(6)},
-                      {max: 64, message: t.passwordMax(64)}
+                      { required: true, message: t.passwordRequired },
+                      { validator: compareToFirstPassword },
+                      { min: 6, message: t.passwordMin(6) },
+                      { max: 64, message: t.passwordMax(64) }
                     ]
                   })(
                     <Input
@@ -368,12 +377,12 @@ const AuthFlow = (props: any) => {
 
             <Row gutter={8}>
               <Col span={12}>
-                <PasswordStrengthBar password={getFieldValue('password') || ''}/>
+                <PasswordStrengthBar password={getFieldValue('password') || ''} />
               </Col>
 
               <Col span={4}>
                 <Button onClick={() => setShowPassword(s => !s)} shape="circle"
-                        icon={showPassword ? 'eye' : 'eye-invisible'}/>
+                  icon={showPassword ? 'eye' : 'eye-invisible'} />
               </Col>
             </Row>
 
@@ -383,8 +392,8 @@ const AuthFlow = (props: any) => {
               <Row gutter={8}>
                 <Col span={12}>
                   {getFieldDecorator('captcha', {
-                    rules: [{required: true, message: t.captchaRequired}]
-                  })(<Input/>)}
+                    rules: [{ required: true, message: t.captchaRequired }]
+                  })(<Input />)}
                 </Col>
                 <Col span={12}>
                   <Button onClick={getCaptcha}>
@@ -395,10 +404,10 @@ const AuthFlow = (props: any) => {
             </Form.Item>
 
             <Form.Item>
-              {getFieldDecorator('agreement', {valuePropName: 'checked'})(
+              {getFieldDecorator('agreement', { valuePropName: 'checked' })(
                 <Checkbox>
                   {t.iHaveRead}
-                  <a onClick={() => dispatch({type: GO_FORWARD, payload: LEGAL})}>
+                  <a onClick={() => dispatch({ type: GO_FORWARD, payload: LEGAL })}>
                     {t.agreement}
                   </a>
                 </Checkbox>
@@ -406,27 +415,27 @@ const AuthFlow = (props: any) => {
             </Form.Item>
 
             <div className="Row Between">
-              <a onClick={() => dispatch({type: GO_FORWARD, payload: ENTER_EMAIL})}>
+              <a onClick={() => dispatch({ type: GO_FORWARD, payload: ENTER_EMAIL })}>
                 {t.signInInstead}
               </a>
               <Button type="primary" htmlType="submit" loading={register.loading}
-                      disabled={!Boolean(getFieldValue('agreement'))}>
+                disabled={!Boolean(getFieldValue('agreement'))}>
                 {t.register}
               </Button>
             </div>
           </div>
 
           <div className={flowStack[flowStack.length - 1] === LEGAL ? 'Fade-In' : 'Hidden'}>
-            <a onClick={() => dispatch({type: GO_BACK})}>
-              <Icon type="arrow-left"/>
+            <a onClick={() => dispatch({ type: GO_BACK })}>
+              <Icon type="arrow-left" />
             </a>
 
             <div className="Column">
-              <BrandIcon/>
+              <BrandIcon />
               <h1>{t.legalLabel}</h1>
             </div>
 
-            <p style={{overflowY: 'scroll', maxHeight: '600px'}}>{t.legal}</p>
+            <p style={{ overflowY: 'scroll', maxHeight: '600px' }}>{t.legal}</p>
           </div>
         </Form>
       </Card>
@@ -438,7 +447,7 @@ const AuthFlow = (props: any) => {
       payload = (
         <Form onSubmit={handlePasswordReset}>
           <div className="Column Centered">
-            <BrandIcon/>
+            <BrandIcon />
             <h1>
               {t.resetPassword}
             </h1>
@@ -447,23 +456,23 @@ const AuthFlow = (props: any) => {
           <Form.Item label={t.passwordPlaceholder}>
             {getFieldDecorator('password', {
               rules: [
-                {required: true, message: t.passwordRequired},
-                {validator: validateToNextPassword},
-                {min: 6, message: t.passwordMin(6)},
-                {max: 64, message: t.passwordMax(64)}
+                { required: true, message: t.passwordRequired },
+                { validator: validateToNextPassword },
+                { min: 6, message: t.passwordMin(6) },
+                { max: 64, message: t.passwordMax(64) }
               ]
-            })(<Input.Password size="large" placeholder={t.passwordPlaceholder}/>)}
+            })(<Input.Password size="large" placeholder={t.passwordPlaceholder} />)}
           </Form.Item>
 
           <Form.Item label={t.confirmPassword}>
             {getFieldDecorator('confirm', {
               rules: [
-                {required: true, message: t.confirmPassword},
-                {validator: compareToFirstPassword},
-                {min: 6, message: t.passwordMin(6)},
-                {max: 64, message: t.passwordMax(64)}
+                { required: true, message: t.confirmPassword },
+                { validator: compareToFirstPassword },
+                { min: 6, message: t.passwordMin(6) },
+                { max: 64, message: t.passwordMax(64) }
               ]
-            })(<Input.Password size="large" onBlur={handleConfirmBlur} placeholder={t.confirmPassword}/>)}
+            })(<Input.Password size="large" onBlur={handleConfirmBlur} placeholder={t.confirmPassword} />)}
           </Form.Item>
 
           <div className="Row End">
@@ -476,10 +485,10 @@ const AuthFlow = (props: any) => {
     } else {
       payload = (
         <div className="Column Centered">
-          <BrandIcon/>
+          <BrandIcon />
           <h1>{t.resetRequest}</h1>
           <p>
-            <Icon type="user"/> {getFieldValue('email')}
+            <Icon type="user" /> {getFieldValue('email')}
           </p>
           <p>
             {t.resetPasswordSuccess}
@@ -488,16 +497,16 @@ const AuthFlow = (props: any) => {
       );
     }
 
-    return <Card style={{width: 400}}>{payload}</Card>;
+    return <Card style={{ width: 400 }}>{payload}</Card>;
   } else {
     return (
       <Card>
-        <a onClick={() => dispatch({type: GO_BACK})}>
-          <Icon type="arrow-left"/>
+        <a onClick={() => dispatch({ type: GO_BACK })}>
+          <Icon type="arrow-left" />
         </a>
       </Card>
     );
   }
 };
 
-export default (Form.create({name: 'auth_flow'})(AuthFlow));
+export default (Form.create({ name: 'auth_flow' })(AuthFlow));

@@ -15,8 +15,6 @@ import PasswordResetContext from "./shared/contexts/password-reset";
 import {Layout} from "antd";
 import {AppHeader} from "./shared/layout/header/header";
 import Routes from "./routes";
-import {UserBalance} from "./shared/contexts/user-balance";
-import {Notifications} from "./shared/contexts/notification";
 
 setupAxiosInterceptors();
 
@@ -25,26 +23,12 @@ const baseHref = document.querySelector('base').getAttribute('href')
   .replace(/\/$/, '');
 
 export const App = (props: any) => {
-
   const auth = useContext(Authentication);
   const translation = useContext(Translation);
-  const balance = useContext(UserBalance);
-  const notifications = useContext(Notifications);
 
   useEffect(() => {
     auth.getSession();
-    balance.update();
-    notifications.fetchNotificationsCount();
-
     setOnUnauthenticated(() => auth.clearAuthentication);
-
-    const updateInterval = setInterval(() => {
-      balance.update();
-      notifications.fetchNotificationsCount();
-    }, 60000); // 60 sec.
-    return () => {
-      clearInterval(updateInterval);
-    };
   }, []);
 
   let pageBody;
