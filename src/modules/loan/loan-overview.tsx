@@ -1,28 +1,29 @@
-import React, {useContext, useState} from 'react';
-import {message} from 'antd';
-import {Translation} from "../../shared/contexts/translation";
+import React, { useContext, useState } from 'react';
+import { message, Carousel } from 'antd';
+import { Translation } from "../../shared/contexts/translation";
 import axios from "axios";
-import {AUTHORITIES, DEALS_API, ITEMS_PER_PAGE} from "../../config/constants";
-import {IDeal} from "../../shared/model/deal.model";
-import {Authentication} from "../../shared/contexts/authentication";
+import { AUTHORITIES, DEALS_API, ITEMS_PER_PAGE } from "../../config/constants";
+import { IDeal } from "../../shared/model/deal.model";
+import { Authentication } from "../../shared/contexts/authentication";
 import LoanSearchForm from "./loan-search-form/loan-search-form";
 import Card from "antd/lib/card";
-import LoanListCard, {Tabs} from "./loan-list-card/loan-list-card";
-import {DealStatus} from "../../shared/model/deal-status";
-import {parseHeaderForLinks} from "../../shared/util/url-utils";
-import {loadMoreDataWhenScrolled} from "../../shared/util/entity-utils";
-import {getSortState} from "../../shared/util/pagination-utils";
+import LoanListCard, { Tabs } from "./loan-list-card/loan-list-card";
+import { DealStatus } from "../../shared/model/deal-status";
+import { parseHeaderForLinks } from "../../shared/util/url-utils";
+import { loadMoreDataWhenScrolled } from "../../shared/util/entity-utils";
+import { getSortState } from "../../shared/util/pagination-utils";
 import Typography from "antd/lib/typography";
 import Button from "antd/lib/button";
 import LoanSuggestion from "./loan-suggestion/loan-suggestion";
-import {PaymentInterval} from "../../shared/model/payment-interval";
+import { PaymentInterval } from "../../shared/model/payment-interval";
 import Icon from "antd/lib/icon";
+import classes from './loan-overview.module.css';
 
-const {Title} = Typography;
+const { Title } = Typography;
 
 const dealState = {
   deals: [] as ReadonlyArray<IDeal>,
-  links: {next: 0},
+  links: { next: 0 },
   totalItems: 0,
   currentTab: Tabs.ACTIVE,
   minTerm: 0,
@@ -93,14 +94,14 @@ const LoanOverview = (props) => {
 
   const handleInfiniteOnLoad = () => {
     setDeals(old => {
-      const newState = {...old, activePage: old.activePage + 1};
+      const newState = { ...old, activePage: old.activePage + 1 };
       loadDeals(getUrl(newState));
       return newState;
     });
   };
 
   const getUrl = (state): string => {
-    const {activePage, itemsPerPage, sort, order, currentTab, minTerm, withStartBalance} = state;
+    const { activePage, itemsPerPage, sort, order, currentTab, minTerm, withStartBalance } = state;
     const params: string[] = [];
     params.push(`page=${activePage - 1}`);
     params.push(`size=${itemsPerPage}`);
@@ -126,7 +127,8 @@ const LoanOverview = (props) => {
   };
 
   const showOnlyTabs = new Set<Tabs>();
-  let topCard;
+  let topCard: JSX.Element;
+  let suggestionsCarousel: JSX.Element | null = null;
 
   if (isCreditor) {
 
@@ -138,29 +140,56 @@ const LoanOverview = (props) => {
       props.history.push('/loan/new');
     };
 
+    const cards = (
+      <>
+        <Card type="inner" style={{ marginBottom: 12 }}>
+          <LoanSuggestion title={<>{t.deal} 1 <Icon type="dollar" theme="twoTone" /></>}
+            term={90} paymentEvery={PaymentInterval.MONTH} percent={9} onSuccess={onSuccessfulCreate} />
+        </Card>
+        <Card type="inner" style={{ marginBottom: 12 }}>
+          <LoanSuggestion title={<>{t.deal} 2 <Icon type="dollar" theme="twoTone" /></>}
+            term={30} paymentEvery={PaymentInterval.DAY} percent={1} onSuccess={onSuccessfulCreate} />
+        </Card>
+        <Card type="inner" style={{ marginBottom: 12 }}>
+          <LoanSuggestion title={<>{t.deal} 3 <Icon type="dollar" theme="twoTone" /></>}
+            term={180} paymentEvery={PaymentInterval.ONE_TIME} percent={25} onSuccess={onSuccessfulCreate} />
+        </Card>
+      </>
+    );
+
     topCard = (
-      <div className="Margin-Bottom">
+      <div className={`Margin-Bottom ${classes.Suggestions}`}>
         <Card title={t.instantDeal}>
-          <div className="Row Around Wrap">
-            <Card type="inner">
-              <LoanSuggestion title={<>{t.deal} 1 <Icon type="dollar" theme="twoTone" /></>}
-                              term={90} paymentEvery={PaymentInterval.MONTH} percent={9} onSuccess={onSuccessfulCreate}/>
-            </Card>
-            <Card type="inner">
-              <LoanSuggestion title={<>{t.deal} 2 <Icon type="dollar" theme="twoTone" /></>}
-                              term={30} paymentEvery={PaymentInterval.DAY} percent={1} onSuccess={onSuccessfulCreate}/>
-            </Card>
-            <Card type="inner">
-              <LoanSuggestion title={<>{t.deal} 3 <Icon type="dollar" theme="twoTone" /></>}
-                              term={180} paymentEvery={PaymentInterval.ONE_TIME} percent={25} onSuccess={onSuccessfulCreate}/>
-            </Card>
-          </div>
-          <div className="Line-Centered Margin-Top">
+          <div className="Row Around Wrap">{cards}</div>
+          <div className="Line-Centered">
             <Button size="large" type="dashed" onClick={onNewDealClicked}>{t.newDeal}</Button>
           </div>
         </Card>
       </div>
     );
+
+    suggestionsCarousel = (
+      <div className={`${classes.SuggestionsMobile}`}>
+        <Carousel autoplay>
+          <Card type="inner">
+            <LoanSuggestion title={<>{t.deal} 1 <Icon type="dollar" theme="twoTone" /></>}
+              term={90} paymentEvery={PaymentInterval.MONTH} percent={9} onSuccess={onSuccessfulCreate} />
+          </Card>
+          <Card type="inner">
+            <LoanSuggestion title={<>{t.deal} 2 <Icon type="dollar" theme="twoTone" /></>}
+              term={30} paymentEvery={PaymentInterval.DAY} percent={1} onSuccess={onSuccessfulCreate} />
+          </Card>
+          <Card type="inner">
+            <LoanSuggestion title={<>{t.deal} 3 <Icon type="dollar" theme="twoTone" /></>}
+              term={180} paymentEvery={PaymentInterval.ONE_TIME} percent={25} onSuccess={onSuccessfulCreate} />
+          </Card>
+        </Carousel>
+        <div className="Line-Centered Margin-Top">
+          <Button size="large" type="dashed" onClick={onNewDealClicked}>{t.newDeal}</Button>
+        </div>
+      </div>
+    );
+
     showOnlyTabs.add(Tabs.ACTIVE);
     showOnlyTabs.add(Tabs.PENDING);
     showOnlyTabs.add(Tabs.ALL);
@@ -169,7 +198,7 @@ const LoanOverview = (props) => {
       <div className="Margin-Bottom">
         <Card title={t.dealSearch}>
           <div className="Line-Centered">
-            <LoanSearchForm onSearchClicked={searchDeals}/>
+            <LoanSearchForm onSearchClicked={searchDeals} />
           </div>
         </Card>
       </div>
@@ -182,14 +211,15 @@ const LoanOverview = (props) => {
   return (
     <>
       {topCard}
+      {suggestionsCarousel}
       <LoanListCard handleInfiniteOnLoad={handleInfiniteOnLoad}
-                    dealClickHandler={dealClickHandler}
-                    hasMore={deals.activePage - 1 < deals.links.next}
-                    pageStart={deals.activePage}
-                    showOnlyTabs={showOnlyTabs}
-                    active={deals.currentTab}
-                    deals={deals.deals}
-                    tabChanged={handleTabChange}/>
+        dealClickHandler={dealClickHandler}
+        hasMore={deals.activePage - 1 < deals.links.next}
+        pageStart={deals.activePage}
+        showOnlyTabs={showOnlyTabs}
+        active={deals.currentTab}
+        deals={deals.deals}
+        tabChanged={handleTabChange} />
     </>
   );
 };

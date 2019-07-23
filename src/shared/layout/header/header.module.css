@@ -1,0 +1,13 @@
+@media screen and (max-width: 660px) {
+    .HeadFull {
+        display: none;
+    }
+
+}
+
+@media screen and (min-width: 660px) {
+
+    .HeadShort {
+        display: none;
+    }
+}

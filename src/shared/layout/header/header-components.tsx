@@ -1,6 +1,6 @@
 import React from 'react';
-import {NavLink as Link} from 'react-router-dom';
-import {Icon} from 'antd';
+import { NavLink as Link } from 'react-router-dom';
+import { Icon } from 'antd';
 
 export const BrandIcon = props => (
   <div className="Brand" {...props}>
@@ -10,6 +10,14 @@ export const BrandIcon = props => (
 
 export const Brand = props => (
   <Link to="/">
-    <BrandIcon />
+    <BrandIcon {...props} />
+  </Link>
+);
+
+export const BrandIconLink = props => (
+  <Link to="/">
+    <div className="Brand" {...props}>
+      <Icon type="stock" />
+    </div>
   </Link>
 );
