@@ -1,0 +1,27 @@
+@media screen and (max-width: 660px) {
+    .DetailsCard {
+        margin-bottom: 9px;
+    }
+
+    .StatisticsCard {
+        margin-bottom: 9px;
+    }
+}
+
+@media screen and (min-width: 660px) {
+
+.Cards {
+    display: flex;
+    margin-bottom: 24px;
+    align-items: flex-start;
+}
+
+    .DetailsCard {
+        margin-right: 2%;
+        width: 49%;
+    }
+
+    .StatisticsCard {
+        width: 49%;
+    }
+}

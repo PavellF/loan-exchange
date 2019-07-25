@@ -10,7 +10,7 @@ export interface Language {
   load: () => Promise<any>;
 }
 /*
-* Has to be sorted by importance.
+* Has to be manually sorted by importance.
 * */
 export const languages: ReadonlyArray<Language> = [
   { name: 'English', locale: 'en', importance: 100, load: () => import("../i18n/English") },

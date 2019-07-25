@@ -1,0 +1,23 @@
+@media screen and (max-width: 660px) {
+    .NumericLog {
+        display: flex;
+    flex-flow: column;
+    align-items: flex-start;
+    }
+
+}
+
+@media screen and (min-width: 660px) {
+
+.NumericLog {
+    display: flex;
+    justify-content: space-between;
+}
+
+.NumericLogRight {
+    flex-basis: 55%;
+    display: flex;
+    justify-content: space-between;
+}
+
+}

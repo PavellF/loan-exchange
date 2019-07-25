@@ -1,0 +1,33 @@
+.Statistics {
+    display: flex;
+    margin-top: 24px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+@media screen and (max-width: 660px) {
+    .ButtonsBottom {
+        text-align: right;
+    }
+
+    .ButtonTop {
+        display: none;
+    }
+
+    .Statistics {
+        justify-content: space-between;
+        flex-flow: column;
+    }
+}
+
+@media screen and (min-width: 660px) {
+
+    .Statistics {
+        justify-content: space-evenly;
+    }
+
+.ButtonsBottom {
+   display: none;
+}
+
+}

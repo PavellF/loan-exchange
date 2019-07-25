@@ -1,0 +1,12 @@
+@media screen and (max-width: 375px) {
+    .Entry {
+        display: flex;
+        flex-flow: column-reverse;
+        min-height: 130px;
+    }
+}
+
+@media screen and (min-width: 375px) {
+    
+
+}

@@ -12,6 +12,7 @@ import axios from "axios";
 import {DealStatus, getStatusColor} from "../../../shared/model/deal-status";
 import {getExpectedProfitForDeal} from "../../../shared/util/math-utils";
 import moment from "moment";
+import classes from './loan.module.css';
 
 export const Loan = props => {
   const t = useContext(Translation).translation;
@@ -121,8 +122,8 @@ export const Loan = props => {
 
   return (
     <React.Fragment>
-      <div className="Row Margin-Bottom Align-Start">
-        <Card title={t.loanDetails} style={{marginRight: '2%', width: '49%'}} extra={getTag()}>
+      <div className={classes.Cards}>
+        <Card title={t.loanDetails} className={classes.DetailsCard} extra={getTag()}>
           <div className="Row Between Wrap">
             <div className="Column">
               {state.deal.dateOpen ?
@@ -156,8 +157,7 @@ export const Loan = props => {
           {cardBottom}
 
         </Card>
-
-        <Card title={t.creditStatistic} style={{width: '49%'}}>
+        <Card title={t.creditStatistic} className={classes.StatisticsCard}>
           <LoanStatistics startBalance={state.deal.startBalance || 0}
                           averagePayment={profit.averagePayment}
                           profit={profit.profit}/>

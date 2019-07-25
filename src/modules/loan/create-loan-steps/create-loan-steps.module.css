@@ -1,0 +1,23 @@
+@media screen and (max-width: 660px) {
+    .Summary {
+        display: flex;
+    justify-content: space-between;
+    min-height: 136px;
+    width: 100%;
+    flex-wrap: wrap;
+    }
+
+}
+
+@media screen and (min-width: 660px) {
+
+.Summary {
+    display: flex;
+    justify-content: space-around;
+    min-height: 136px;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+
+}

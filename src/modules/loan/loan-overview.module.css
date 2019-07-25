@@ -6,6 +6,10 @@
     .SuggestionsMobile {
         display: block;
     }
+
+    .SuggestionCard {
+        margin-bottom: 0px;
+    }
 }
 
 @media screen and (min-width: 375px) {
@@ -15,5 +19,9 @@
 
     .SuggestionsMobile {
         display: none;
+    }
+
+    .SuggestionCard {
+        margin-bottom: 12px;
     }
 }

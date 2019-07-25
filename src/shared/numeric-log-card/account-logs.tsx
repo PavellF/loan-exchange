@@ -15,6 +15,7 @@ import InfiniteScroll from 'react-infinite-scroller';
 import {percentageDifference} from "../util/math-utils";
 import Icon from "antd/lib/icon";
 import moment from "moment";
+import classes from './account-logs.module.css';
 
 export enum LogsTab {
   LOGS = 'LOGS',
@@ -55,11 +56,11 @@ const NumericLogCard = ({ location, dealId = null as unknown as number, userId =
     const percentageChange = percentageDifference(item.oldValue, newValue);
 
     return (
-      <List.Item key={item.id} className="Row Between">
+      <List.Item key={item.id} className={classes.NumericLog}>
         <Statistic title={t.BalanceLogEvent[item.type]} value={moment(item.date).calendar()} />
-        <div className="Row Between">
+        <div className={classes.NumericLogRight}>
           <Statistic title={t.balance} value={newValue} prefix={'¢'} suffix={getPercentageDifference(percentageChange)} />
-          <Statistic style={{ marginLeft: '1rem' }} title={t.change} value={item.amountChanged} prefix={'¢'}
+          <Statistic title={t.change} value={item.amountChanged} prefix={'¢'}
             valueStyle={{ color: item.amountChanged < 0 ? '#cf1322' : '#3f8600' }}
           />
         </div>

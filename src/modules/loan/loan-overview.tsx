@@ -140,53 +140,38 @@ const LoanOverview = (props) => {
       props.history.push('/loan/new');
     };
 
-    const cards = (
-      <>
-        <Card type="inner" style={{ marginBottom: 12 }}>
+    const cards = [
+        <Card key={0} type="inner" className={ `${classes.SuggestionCard}` }>
           <LoanSuggestion title={<>{t.deal} 1 <Icon type="dollar" theme="twoTone" /></>}
             term={90} paymentEvery={PaymentInterval.MONTH} percent={9} onSuccess={onSuccessfulCreate} />
-        </Card>
-        <Card type="inner" style={{ marginBottom: 12 }}>
+        </Card>,
+        <Card key={1} type="inner" className={ `${classes.SuggestionCard}` }>
           <LoanSuggestion title={<>{t.deal} 2 <Icon type="dollar" theme="twoTone" /></>}
             term={30} paymentEvery={PaymentInterval.DAY} percent={1} onSuccess={onSuccessfulCreate} />
-        </Card>
-        <Card type="inner" style={{ marginBottom: 12 }}>
+        </Card>,
+        <Card key={2} type="inner" className={ `${classes.SuggestionCard}` }>
           <LoanSuggestion title={<>{t.deal} 3 <Icon type="dollar" theme="twoTone" /></>}
             term={180} paymentEvery={PaymentInterval.ONE_TIME} percent={25} onSuccess={onSuccessfulCreate} />
         </Card>
-      </>
+      ];
+
+    const newDealButton = (
+      <Button size="large" type="dashed" onClick={onNewDealClicked}>{t.newDeal}</Button>
     );
 
     topCard = (
       <div className={`Margin-Bottom ${classes.Suggestions}`}>
         <Card title={t.instantDeal}>
           <div className="Row Around Wrap">{cards}</div>
-          <div className="Line-Centered">
-            <Button size="large" type="dashed" onClick={onNewDealClicked}>{t.newDeal}</Button>
-          </div>
+          <div className="Line-Centered">{newDealButton}</div>
         </Card>
       </div>
     );
 
     suggestionsCarousel = (
       <div className={`${classes.SuggestionsMobile}`}>
-        <Carousel autoplay>
-          <Card type="inner">
-            <LoanSuggestion title={<>{t.deal} 1 <Icon type="dollar" theme="twoTone" /></>}
-              term={90} paymentEvery={PaymentInterval.MONTH} percent={9} onSuccess={onSuccessfulCreate} />
-          </Card>
-          <Card type="inner">
-            <LoanSuggestion title={<>{t.deal} 2 <Icon type="dollar" theme="twoTone" /></>}
-              term={30} paymentEvery={PaymentInterval.DAY} percent={1} onSuccess={onSuccessfulCreate} />
-          </Card>
-          <Card type="inner">
-            <LoanSuggestion title={<>{t.deal} 3 <Icon type="dollar" theme="twoTone" /></>}
-              term={180} paymentEvery={PaymentInterval.ONE_TIME} percent={25} onSuccess={onSuccessfulCreate} />
-          </Card>
-        </Carousel>
-        <div className="Line-Centered Margin-Top">
-          <Button size="large" type="dashed" onClick={onNewDealClicked}>{t.newDeal}</Button>
-        </div>
+        <Carousel autoplay>{cards}</Carousel>
+        <div className="Line-Centered Margin-Top Margin-Bottom">{newDealButton}</div>
       </div>
     );
 

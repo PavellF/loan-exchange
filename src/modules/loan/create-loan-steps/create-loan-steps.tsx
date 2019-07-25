@@ -15,6 +15,7 @@ import {getSuccessRate, IDeal} from "../../../shared/model/deal.model";
 import axios from "axios";
 import {coinFormatter, coinParser} from "../../../shared/util/entity-utils";
 import {getExpectedProfit} from "../../../shared/util/math-utils";
+import classes from './create-loan-steps.module.css';
 
 const Step = Steps.Step;
 
@@ -176,7 +177,7 @@ const CreateLoanSteps = props => {
             <p>{successRate}</p>
           </div>
 
-          <div className={currentStep === 3 ? 'Row Around Width-Full Height-Medium' : 'Hidden'}>
+          <div className={currentStep === 3 ? classes.Summary : 'Hidden'}>
             <div className="Column Between">
               <Statistic title={t.amount} value={getFieldValue('credit')} suffix={`¢`}/>
               <Statistic

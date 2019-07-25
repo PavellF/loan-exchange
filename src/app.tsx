@@ -31,6 +31,12 @@ export const App = (props: any) => {
     setOnUnauthenticated(() => auth.clearAuthentication);
   }, []);
 
+  useEffect(() => {
+    if (auth.account && auth.account.langKey) {
+      translation.setLanguage(auth.account.langKey);
+    }
+  }, [auth.account, auth.account.langKey]);
+
   let pageBody;
 
   if (!auth.sessionHasBeenFetched) {
@@ -42,10 +48,7 @@ export const App = (props: any) => {
   }
 
   if (auth.isAuthenticated) {
-
-    if (auth.account && auth.account.langKey) {
-      translation.setLanguage(auth.account.langKey);
-    }
+    
     pageBody = (
       <Layout>
         <Route component={AppHeader}/>
